@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>등록화면</title>
+</head>
+<body>
+<header th:insert="layout/header.html"></header>
+<!-- 등록시 필요정보 : 제목, 내용, 파일(다중 파일), 이미지(대표이미지) -->
+<div>
+    <div style="width:80%; margin: 10px  auto;">
+        <form name="boardForm" action="/board/post" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="bdGroup" th:value="${bdGroup}">
+            <input type="hidden" name="bdOrder" th:value="${bdOrder}">
+            <input type="hidden" name="bdIndent" th:value="${bdIndent}">
+            <label for="title" class="col-sm-2 col-form-label"><strong>제목</strong></label>
+            <input type="text" id="title" name="title" class="form-control mt-4 mb-2" placeholder="제목을 입력해주세요." required>
+            <input type="text" id="registerer" name="registerer" class="form-control mt-4 mb-2" placeholder="작성자 이름을 입력해주세요." required>
+            <div class="form-group">
+                <textarea class="form-control" rows="10" id="content" name="content" placeholder="내용을 입력해주세요" required ></textarea>
+            </div>
+            <!--<div>
+                <img src="/img/animalImage/animal1.png" rel="동물이미지1">
+            </div>-->
+            <div class="form-group row">
+                <label for="inputFile" class="col-sm-2 col-form-label"><strong>첨부 파일</strong></label>
+                <div class="col-sm-10">
+                    <div class="custom-file" id="inputFile">
+                        <input name="file" type="file" multiple="multiple" class="custom-file-input" id="customFile">
+                        <label class="custom-file-label" for="customFile">파일을 선택해 주세요.</label>
+                        <a href="#" id="fileDelete" onclick="deleteBtn();" style="display: none;">
+                            <img src="/img/imgBtn/deleteBtn.PNG" style="width: 40px;">
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="topFixedYn" class="col-sm-2 col-form-label"><strong>상단고정여부</strong></label>
+                <div class="col-sm-10">
+                    <div class="custom-file" id="inputFile">
+                        <span>상단고정</span>
+                        <input type="radio" id="topFixedYn" name="topFixedYn" value="Y">
+                        <span>비고정</span>
+                        <input type="radio" id="topFixedYn" name="topFixedYn" value="N">
+                    </div>
+                </div>
+
+            </div>
+            <div style="text-align: end;" >
+                <input class="btn btn-primary" type="button" onclick="add();" value="등록하기">
+                <input class="btn btn-primary" type="reset" value="초기화">
+                <input class="btn btn-primary" type="button" onclick="history.back(-1);" value="뒤로가기">
+            </div>
+        </form>
+    </div>
+</div>
+<fooler th:insert="layout/fooler.html"></fooler>
+<script type="text/javascript">
+    function add(){
+        var form = document.boardForm;
+
+        if (form.title.value == "" ){
+            alert("제목을 입력해 주세요");
+            form.title.focus();
+            return;
+        }
+        if (form.registerer.value == "" ){
+            alert("이름을 입력해 주세요");
+            form.registerer.focus();
+            return;
+        }
+        if (form.content.value == "" ){
+            alert("내용을 입력해 주세요");
+            form.content.focus();
+            return;
+        }
+        if (confirm("등록하시겠습니까?")){
+            form.submit();
+        }
+    }
+    $(".custom-file-input").on("change", function(){
+        var fileName = $(this).val().split("\\").pop();
+        $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        $("#fileDelete").show();
+    });
+    $("input:radio[name='topFixedYn']").removeAttr("checked"); //우선 체크되어 있는 값을 초기화
+    $("input:radio[name='topFixedYn']:radio[value='Y']").attr('checked', true); //원하는 값 Y를 체크
+    $("input:radio[name='topFixedYn']:checked").val() //체크되어 있는 값
+
+
+    function deleteBtn(){
+        var el = $(".custom-file-label").text('');
+        $("#fileDelete").hide();
+    }
+
+</script>
+</body>
+</html>

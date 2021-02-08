@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.blackmomo.mapper.FileMapper" >
+
+    <resultMap type="com.example.blackmomo.domain.FileDto" id="FileResultMap">
+        <id     column="id"            property="Id" />
+        <result column="file_path"         property="filePath" />
+        <result column="filename"       property="filename" />
+        <result column="orig_filename"    property="origFilename"  />
+    </resultMap>
+
+    <sql id="column">
+        id
+        ,file_path
+        ,filename
+        ,orig_filename
+    </sql>
+
+    <insert id="saveFile" >
+        insert into dodo.file (<include refid="column" />)
+        value
+        ((select IFNULL(max(id)+'1','1') from dodo.file b)
+        ,#{filePath}
+        ,#{filename}
+        ,#{origFilename})
+    </insert>
+
+    <select id="selectFile" resultType="int">
+        select max(id) from dodo.file
+    </select>
+
+    <select id="viewFile" parameterType="int" resultMap="FileResultMap">
+        select * from dodo.file where id = #{id};
+    </select>
+
+    <!-- 파일 다운 로드-->
+    <select id="fileDownload" resultMap="FileResultMap">
+        select * from dodo.file where id = #{id};
+    </select>
+
+    <select id="findSelectEdit" parameterType="int" resultMap="FileResultMap">
+        select * from dodo.file where id = #{id};
+    </select>
+
+    <update id="fileUpdate" parameterType="com.example.blackmomo.domain.FileDto">
+        update file set
+            file_path = #{filePath}
+            ,filename = #{filename}
+            ,orig_filename = #{origFilename}
+        where id = #{id}
+    </update>
+
+    <select id="fileName" resultMap="FileResultMap">
+        select * from dodo.file where id = #{id}
+    </select>
+
+    <delete id="fileDelete" parameterType="int">
+        delete from dodo.file where id = #{id}
+    </delete>
+</mapper>

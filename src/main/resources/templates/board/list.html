@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>게시판 목록</title>
+    <script src="https://kit.fontawesome.com/e1bd1cb2a5.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+<!--    <link rel='stylesheet' href='/webjars/bootstrap/4.5.0/css/bootstrap.min.css'>
+    <link href="https://fonts.googleapis.com/css?family=Cute+Font&display=swap" rel="stylesheet">-->
+</head>
+<style>
+    .listBtn {
+        width: 30px;
+    }
+    .orderBy >a:link { color: black; text-decoration: none;}
+    .orderBy >a:visited { color: darkmagenta; text-decoration: none;}
+    .orderBy >a:hover { color: blue; text-decoration: underline;}
+</style>
+<body>
+<header th:insert="layout/header.html"></header>
+<div class="container" style="margin: 10px auto;">
+    <div>
+        <h3>자유게시판</h3>
+    </div>
+    <div>
+        <form name="search" action="/board/list" method="get">
+            <div style="text-align: end; float:none;">
+                <select id="searchType" name="searchType" class="searchType" >
+                    <th:block th:if="${search.searchType} == 'all'">
+                        <option value="all" selected="selected">전체</option>
+                    </th:block>
+                    <th:block th:unless="${search.searchType} == 'all'">
+                        <option value="all">전체</option>
+                    </th:block>
+
+                    <th:block th:if="${search.searchType} == 't'">
+                        <option value="t" selected="selected">제목</option>
+                    </th:block>
+                    <th:block th:unless="${search.searchType} == 't'">
+                        <option value="t">제목</option>
+                    </th:block>
+
+                    <th:block th:if="${search.searchType} == 'c'">
+                        <option value="c" selected="selected">내용</option>
+                    </th:block>
+                    <th:block th:unless="${search.searchType} == 'c'">
+                        <option value="c">내용</option>
+                    </th:block>
+
+                    <th:block th:if="${search.searchType} == 'w'">
+                        <option value="w" selected="selected">작성자</option>
+                    </th:block>
+                    <th:block th:unless="${search.searchType} == 'w'">
+                        <option value="w">작성자</option>
+                    </th:block>
+                </select>
+                <input type="text" id="keyword" name="keyword" th:value="${search.keyword}" placeholder="검색어">
+                <button id="searchBtn" class="searchBtn" type="button" >검색</button>
+            </div>
+        </form>
+    </div>
+
+    <div style="float:left" class="orderBy">
+        <input type="hidden" id="orderBy" th:value="${search.orderBy}">
+        <input type="hidden" id="orderType" th:value="${search.orderType}">
+        <a name="orderBy" href="#" onclick="orderBy('id')" rel="">
+            <th:block th:if="${search.orderBy} == 'id'">
+                <b>최신순
+                    <img src="/img/imgBtn/descImg.PNG" th:if="${search.orderType} == 'DESC'" style="width: 10px;">
+                    <img src="/img/imgBtn/ascImg.PNG" th:if="${search.orderType} == 'ASC'" style="width: 10px;">
+                </b>
+            </th:block>
+            <th:block th:unless="${search.orderBy} == 'id'">최신순</th:block>
+        </a>
+        /
+        <a  name="orderBy" href="#" onclick="orderBy('board_count');" rel="" >
+            <th:block th:if="${search.orderBy} == 'board_count'">
+                <b>조회수순
+                    <img src="/img/imgBtn/descImg.PNG" th:if="${search.orderType} == 'DESC'" style="width: 10px;">
+                    <img src="/img/imgBtn/ascImg.PNG" th:if="${search.orderType} == 'ASC'" style="width: 10px;">
+                </b>
+            </th:block>
+            <th:block th:unless="${search.orderBy} == 'board_count'">조회수순</th:block>
+        </a>
+    </div>
+
+    <div style="float:right;">
+        <a href="javascript:void(0);" onclick="">
+            <img class="listBtn" src="/img/imgBtn/galleryImgBtn.png" rel="갤러리형 버튼">
+        </a>
+        <a href="javascript:void(0);" onclick="">
+            <img class="listBtn" src="/img/imgBtn/listImgBtn.PNG" rel="리스트형 버튼">
+        </a>
+        <!-- 게시판 타입 : 리스트형, 갤러리형  -->
+    </div>
+    <div style="float: right;">
+        <select id="cntPerPage" name="cntPerPage" style="height: 30px;" th:onchange="|Change(${paging.nowPage})|">
+            <th:block th:if="${paging.cntPerPage} == 5">
+                <option value="5" selected="selected">5줄 보기</option>
+            </th:block>
+            <th:block th:unless="${paging.cntPerPage} == 5">
+                <option value="5" >5줄 보기</option>
+            </th:block>
+            <th:block th:if="${paging.cntPerPage} == 10">
+                <option value="10" selected="selected">10줄 보기</option>
+            </th:block>
+            <th:block th:unless="${paging.cntPerPage} == 10">
+                <option value="10" >10줄 보기</option>
+            </th:block>
+            <th:block th:if="${paging.cntPerPage} == 15">
+                <option value="15" selected="selected">15줄 보기</option>
+            </th:block>
+            <th:block th:unless="${paging.cntPerPage} == 15">
+                <option value="15" >15줄 보기</option>
+            </th:block>
+            <th:block th:if="${paging.cntPerPage} == 20">
+                <option value="20" selected="selected">20줄 보기</option>
+            </th:block>
+            <th:block th:unless="${paging.cntPerPage} == 20">
+                <option value="20" >20줄 보기</option>
+            </th:block>
+        </select>
+    </div> <!-- 옵션선택 끝 -->
+    <div>
+        <th:block th:if="${postList} != null">
+            <table class="table" style="margin-top: 40px;">
+                <thead class="thead-light">
+                <tr class="text-center">
+                    <th scope="col">번호</th>
+                    <th scope="col">제목</th>
+                    <th scope="col">작성자</th>
+                    <th scope="col">최종등록일</th>
+                    <th scope="col">조회수</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="text-center" th:each="post : ${postList}">
+                    <th scope="row">
+                        <span th:text="${post?.id}"></span>
+                    </th>
+                    <td>
+                        <a th:href="@{'/board/view/' + ${post?.id}}">
+                            <span th:text="${post?.title}"></span>
+                        </a>
+                    </td>
+                    <!-- 등록일시과 수정일시가 같을 경우 등록자 -->
+                    <th:block th:if="${post?.registerDate == post?.modifiedDate}">
+                        <td>
+                            <span th:text="${post?.registerer}"></span>
+                        </td>
+                        <td>
+                            <span th:text="${#temporals.format(post?.registerDate, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                            <!--<span th:text="${post?.registerDate}" th:value="${post?.registerDate}"></span>-->
+                        </td>
+                    </th:block>
+                    <!-- 등록일시과 수정일시가 다를 경우 수정자 -->
+                    <th:block th:if="${post?.registerDate != post?.modifiedDate}">
+                        <td>
+                            <span th:text="${post?.modifier}"></span>
+                        </td>
+                        <td>
+                            <span th:text="${#temporals.format(post?.modifiedDate, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                        </td>
+                    </th:block>
+                    <td>
+                        <span th:text="${post?.boardCount}"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </th:block>
+        <th:block th:if="${postList} == null">
+            <div style="width: 100%; height: 100px; text-align: center; border: 1px #e9ecef solid;">
+                <p>등록된 게시물이 없습니다.</p>
+            </div>
+        </th:block>
+        <div style="display: block; text-align: center;">
+            <!-- 이전페이지 -->
+            <th:block th:if="${paging.startPage != 1 }">
+                <a th:href="'/board/list?' + 'searchType=' + ${search.searchType} + '&keyword=' + ${search.keyword} + '&orderBy=' + ${search.orderBy} + '&orderType=' + ${search.orderType} + '&nowPage=' + ${paging.startPage - 1 } + '&cntPerPage=' + ${paging.cntPerPage}"> &lt; </a>
+            </th:block>
+
+            <th:block th:each="p : ${#numbers.sequence(paging.startPage, paging.endPage)}">
+                <th:block th:if="${p == paging.nowPage }">
+                    <b th:text="${p}"></b>
+                </th:block>
+                <th:block th:if="${p != paging.nowPage }">
+                    <a th:href="'/board/list?' + 'searchType=' + ${search.searchType} + '&keyword=' + ${search.keyword} + '&orderBy=' + ${search.orderBy} + '&orderType=' + ${search.orderType} +'&nowPage=' + ${p} + '&cntPerPage=' + ${paging.cntPerPage}" th:text="${p}"></a>
+                    <!--<a href="#" onclick="location.href='http://localhost:8080/board/list?nowPage='+${p}+'&cntPerPage='+paging.cntPerPage" th:text="${p}"></a>-->
+                   <!-- <a href="#" th:onclick="|paging(${p})|" th:text="${p}"></a>-->
+                </th:block>
+            </th:block>
+
+            <!--다음페이지-->
+            <th:block th:if="${paging.endPage != paging.lastPage }">
+                <a th:href="'/board/list?' + 'searchType=' + ${search.searchType} + '&keyword=' + ${search.keyword} + '&orderBy=' + ${search.orderBy} + '&orderType=' + ${search.orderType} + '&nowPage=' + ${paging.endPage + 1 } + '&cntPerPage=' + ${paging.cntPerPage}"> &gt; </a>
+            </th:block>
+        </div>
+        <div class="row">
+            <div class="col-auto mr-auto"></div>
+            <div class="col-auto">
+                <a class="btn btn-primary" th:href="@{/board/post}" role="button">게시글작성</a>
+            </div>
+        </div>
+    </div>
+</div>
+<footer th:insert="layout/fooler.html"></footer>
+<!--<script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
+<script src="/webjars/bootstrap/4.5.0/js/bootstrap.min.js"></script>-->
+<script type="text/javascript">
+    // 페이징
+    $(function (){
+        $('#searchBtn').click(function (){
+            self.location = "/board/list?"
+                + "searchType=" + $(".searchType option:selected").val()
+                + "&keyword=" + $('#keyword').val()
+                + "&orderBy=" + $("#orderBy").val()
+                + "&orderType=" + $('#orderType').val()
+                + "&nowPage=" + [[${paging.nowPage}]]
+                + "&cntPerPage="+ $("#cntPerPage option:selected").val();
+        })
+    });
+
+    /* 한 페이지당 노출목록수 */
+    function Change(pageNo){
+        /* 노출 페이지 수 */
+        var nowPaging = $("#cntPerPage option:selected").val();
+        /* 정렬방식 */
+       /* var idx = [[${search.orderBy}]];*/
+        var idx = $("#orderBy").val();
+
+        if(nowPaging == 5){
+            location.href="/board/list?"
+                + "searchType=" + $(".searchType option:selected").val()
+                + "&keyword=" + $('#keyword').val()
+                + "&orderBy=" + idx
+                + "&orderType=" + $('#orderType').val()
+                + "&nowPage=" + pageNo
+                + "&cntPerPage="+nowPaging;
+        }else if(nowPaging == 10){
+            location.href="/board/list?"
+                + "searchType=" + $(".searchType option:selected").val()
+                + "&keyword=" + $('#keyword').val()
+                + "&orderBy=" + idx
+                + "&orderType=" + $('#orderType').val()
+                + "&nowPage=" + pageNo
+                + "&cntPerPage="+nowPaging;
+        }else if(nowPaging == 15){
+            location.href="/board/list?"
+                + "searchType=" + $(".searchType option:selected").val()
+                + "&keyword=" + $('#keyword').val()
+                + "&orderBy=" + idx
+                + "&orderType=" + $('#orderType').val()
+                + "&nowPage=" + pageNo
+                + "&cntPerPage="+nowPaging;
+        }else if(nowPaging == 20){
+            location.href="/board/list?"
+                + "searchType=" + $(".searchType option:selected").val()
+                + "&keyword=" + $('#keyword').val()
+                + "&orderBy=" + idx
+                + "&orderType=" + $('#orderType').val()
+                + "&nowPage=" + pageNo
+                + "&cntPerPage="+nowPaging;
+        }
+
+    };
+
+    /* 페이지 정렬방식 */
+    function orderBy(idx){
+        var nowPaging = $("#cntPerPage option:selected").val();
+        var pageNo = [[${paging.nowPage}]]
+
+        var orderType = $("#orderType").val();
+
+        if(idx == 'id'){
+            if (orderType == "DESC"){
+                orderType = "ASC"
+            }else if (orderType == "ASC"){
+                orderType = "DESC"
+            }
+            location.href="/board/list?"
+                + "searchType=" + $(".searchType option:selected").val()
+                + "&keyword=" + $('#keyword').val()
+                + "&orderBy=" + idx
+                + "&orderType=" + orderType
+                + "&nowPage=" + pageNo
+                + "&cntPerPage="+nowPaging;
+        }else if(idx == 'board_count'){
+            if (orderType == "DESC"){
+                orderType = "ASC"
+            }else if (orderType == "ASC"){
+                orderType = "DESC"
+            }
+            location.href="/board/list?"
+                + "searchType=" + $(".searchType option:selected").val()
+                + "&keyword=" + $('#keyword').val()
+                + "&orderBy=" + idx
+                + "&orderType=" + orderType
+                + "&nowPage=" + pageNo
+                + "&cntPerPage="+nowPaging;
+        }
+    }
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.blackmomo.mapper.BoardMapper">
+
+    <resultMap type="com.example.blackmomo.domain.Board" id="boardResultMap">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="registerer" property="registerer"/>
+        <result column="register_date" property="registerDate"/>
+        <result column="modifier" property="modifier"/>
+        <result column="modified_date" property="modifiedDate"/>
+        <result column="file_id" property="fileId"/>
+        <result column="expose_yn" property="exposeYn"/>
+        <result column="use_yn" property="useYn"/>
+        <result column="delete_yn" property="deleteYn"/>
+        <result column="board_type" property="boardType"/>
+        <result column="board_count" property="boardCount"/>
+    </resultMap>
+
+    <!-- 게시판 컬럼 -->
+    <sql id="column">
+        id
+        ,title
+        ,content
+        ,registerer
+        ,register_date
+        ,modifier
+        ,modified_date
+        ,file_id
+        ,expose_yn
+        ,use_yn
+        ,delete_yn
+        ,board_type
+        ,board_count
+    </sql>
+
+    <!-- 검색조건 -->
+    <sql id="search">
+            delete_yn = "N"
+            and use_yn = "Y"
+            and expose_yn = "Y"
+        <if test="sh.searchType != null">
+
+            <if test="sh.searchType == 't'.toString()">
+                AND title LIKE '%' #{sh.keyword} '%'
+            </if>
+
+            <if test="sh.searchType == 'c'.toString()">
+                AND content LIKE '%' #{sh.keyword}'%'
+            </if>
+
+            <if test="sh.searchType == 'w'.toString()">
+                AND modifier LIKE '%' #{sh.keyword} '%'
+            </if>
+
+            <if test="sh.searchType == 'all'.toString()">
+                AND (title LIKE '%' #{sh.keyword} '%') or (content LIKE '%' #{sh.keyword} '%') or (modifier LIKE '%' #{sh.keyword} '%')
+            </if>
+        </if>
+    </sql>
+
+
+    <!-- 정렬조건 -->
+    <!--<sql id="align_yn">
+        <if test="#{alignYn} == 'Y'">
+            align desc;
+        </if>
+        <if test="#{alignYn} == 'N'">
+            align asc;
+        </if>
+    </sql>-->
+
+    <!--<sql id="align">
+        <if test="#{bo.align} == 1">
+            order by id  desc;
+        </if>
+        <if test="#{bo.align} == 2">
+            order by board_count desc;
+        </if>
+    </sql>-->
+
+    <!-- 게시글 수 조회 -->
+    <select id="countBoard" resultType="int">
+        SELECT COUNT(*)
+        FROM(
+            SELECT bo.*
+            FROM (
+                SELECT @rownum:=@rownum+1 RN, bo.*
+                FROM (
+                    SELECT *
+                    FROM dodo.board bo, (Select @rownum := 0) as R
+                    <where>
+                        <include refid="search"/>
+                    </where>
+                    order by ${sh.orderBy} ${sh.orderType}
+                ) bo
+            ) bo
+        )bo
+    </select>
+
+    <!-- 목록 -->
+    <select id="boardList" resultMap="boardResultMap">
+        SELECT bo.*
+        FROM (
+                 SELECT @rownum:=@rownum+1 RN, bo.*
+                 FROM (
+                     SELECT *
+                     FROM dodo.board bo, (Select @rownum := 0) as R
+                     <where><include refid="search"/></where>
+                     order by ${sh.orderBy} ${sh.orderType}
+                     ) bo
+             ) bo
+        WHERE RN BETWEEN #{page.start} AND #{page.end}
+    </select>
+
+    <!-- 목록(new) -->
+    <select id="boardList2" resultMap="boardResultMap">
+        select * from dodo.board
+    </select>
+
+    <!-- 등록처리 -->
+    <insert id="boardSave">
+        insert into dodo.board (<include refid="column"/>)
+        value
+        ((select IFNULL(max(id)+'1','1') from dodo.board b)
+        ,#{title}
+        ,#{content}
+        ,#{registerer}
+        ,sysdate()
+        ,#{modifier}
+        ,sysdate()
+        ,#{fileId}
+        ,'Y'
+        ,'Y'
+        ,'N'
+        ,'1'
+        ,0)
+    </insert>
+
+    <!--상세정보 조회-->
+    <select id="selectView" parameterType="int" resultMap="boardResultMap">
+        select
+        <include refid="column"/>
+        from board
+        <where>
+            id = #{id}
+        </where>
+    </select>
+
+    <!-- 조회수-->
+    <update id="insertCount" parameterType="int">
+        update board
+        set board_count = board_count + 1
+        where id = #{id}
+    </update>
+
+    <!-- 수정정보 조회 -->
+    <select id="selectEdit" resultMap="boardResultMap">
+        select *
+        from board
+        where id = #{id}
+    </select>
+
+    <!-- 수정 처리 -->
+    <update id="updateEdit">
+        update board
+        set title         = #{title}
+          , content       = #{content}
+          , modifier      = #{modifier}
+          , modified_date = sysdate()
+          , file_id = #{fileId}
+        where id = #{id}
+    </update>
+
+    <update id="delete" parameterType="int">
+        update board
+        set delete_yn = 'Y'
+        where id = #{id};
+    </update>
+
+    <select id="prevSelect" parameterType="int" resultMap="boardResultMap">
+        SELECT id, title FROM (select @num := @num + 1 as num, id, title
+        from board b,
+        (select @num := 0) a
+        where delete_yn = 'N'
+        and use_yn = 'Y'
+        and expose_yn = 'Y'
+        order by id) b
+        <![CDATA[
+        WHERE id < #{id} ORDER BY id DESC LIMIT 1
+        ]]>
+    </select>
+
+    <select id="nextSelect" resultMap="boardResultMap">
+        SELECT id, title FROM (select @num := @num + 1 as num, id, title
+        from board b,
+        (select @num := 0) a
+        where delete_yn = 'N'
+        and use_yn = 'Y'
+        and expose_yn = 'Y'
+        order by id) b WHERE id > #{id} ORDER BY id LIMIT 1
+    </select>
+
+
+</mapper>

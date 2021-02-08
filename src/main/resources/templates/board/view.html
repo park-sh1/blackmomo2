@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>상세</title>
+</head>
+<body>
+<header th:insert="layout/header.html"></header>
+<div class="container">
+    <div style="border-bottom: 1px black solid; padding-bottom: 10px;">
+        <h3 class="card-title" th:text="@{'자유게시판 - ' + ${view.title}}"></h3>
+    </div>
+    <div style="padding: 15px 0px;">
+        <div style="width: 30%;height: 30%;float: left;">
+            <img src="/img/animalImage/이미지4_우꼈소.PNG" alt="대표이미지" style="width: 100%; height: 100%;">
+        </div>
+        <div>
+            <!--<p class="card-text"><small class="text-muted" th:text="@{' 작성자 : ' +${view.author} + ' / ' + '작성일자 : ' +  ${#temporals.format(view.createdDate, 'yyyy-MM-dd HH:mm')}}"></small></p>-->
+            <th:block th:if="${view.registerDate == view.modifiedDate}">
+                <p class="card-text" th:text="@{' 최종작성자 : ' +${view.registerer} + ' / ' + '작성일자 : ' +  ${#temporals.format(view.registerDate, 'yyyy-MM-dd HH:mm:ss')}}"><small class="text-muted"></small></p>
+                <!--<p class="card-text" th:text="@{' 최종작성자 : ' +${view.registerer} + ' / ' + '작성일자 : ' +  ${view.registerDate}}"><small class="text-muted"></small></p>-->
+            </th:block>
+            <th:block th:if="${view.registerDate != view.modifiedDate}">
+                <p class="card-text" th:text="@{' 최종작성자 : ' +${view.modifier} + ' / ' + '작성일자 : ' +  ${#temporals.format(view.modifiedDate, 'yyyy-MM-dd HH:mm:ss')}}"><small class="text-muted"></small></p>
+            </th:block>
+        </div>
+    </div>
+    <div th:if="${view.fileId > 0 }" style="margin: 10px 0px 10px 0px; clear: both;">
+        <strong>첨부파일 : </strong>
+        <a class="card-text" th:href="@{'/board/download/' + ${view?.fileId}}" th:text="${file?.origFilename}"></a>
+    </div>
+    <div class="card" style="clear: both;">
+        <div class="card-body" style="height: 500px; background-color: #f8f8f8;">
+            <pre class="card-text" th:text="${view.content}"></pre>
+        </div>
+    </div>
+    <div>
+        <div style="float: left; width: 50%;border:1px aquamarine solid;">
+            <div style="background-color: aquamarine;float: left;width: 150px; text-align: center;" >이전글(prev)</div>
+            <a href="#" id="boardPrev" th:if="${boardPrev?.id} != null" th:onclick="|prev(${boardPrev?.id})|">
+                <div style="float: left;padding: 0px 10px;" th:text="${boardPrev?.title} != null ? ${boardPrev?.title} : '이전글이 없습니다.'"></div>
+            </a>
+            <a id="boardPrev" th:if="${boardPrev?.id} == null">
+                <div style="float: left;padding: 0px 10px;" th:text="${boardPrev?.title} != null ? ${boardPrev?.title} : '이전글이 없습니다.'"></div>
+            </a>
+            <!--<div th:if="${boardPrev?.title == null}">이전글의 제목을 노출합니다.</div>-->
+            <!--<div>이전글이 없습니다.</div>-->
+        </div>
+        <div style="float: left; width: 50%;border:1px aquamarine solid;">
+            <div style="background-color: aquamarine;float: left;width: 150px; text-align: center;">다음글(Next)</div>
+            <a id="boardNext" href="#" th:if="${boardNext?.id} != null" th:onclick="|next(${boardNext?.id})|">
+                <div style="float: left;padding: 0px 10px;" th:text="${boardNext?.title} != null ? ${boardNext?.title} : '다음글이 없습니다.'"></div>
+            </a>
+            <a id="boardNext" th:if="${boardNext?.id} == null">
+                <div style="float: left;padding: 0px 10px;" th:text="${boardNext?.title} != null ? ${boardNext?.title} : '다음글이 없습니다.'"></div>
+            </a>
+            <!--<div th:if="${boardNext?.title == null}">다음글의 제목을 노출합니다.</div>-->
+            <!--<div>다음글이 없습니다.</div>-->
+        </div>
+    </div>
+
+    <div class="row" style="clear: both; margin-top: 40px">
+        <div class="col-auto mr-auto"></div>
+        <div class="col-auto">
+            <a class="btn btn-info" th:href="@{'/board/edit/' + ${view.id}}" role="button">수정</a>
+            <!--<a class="btn btn-info" href="#" onclick="history.back(-1);" role="button">목록</a>-->
+            <a class="btn btn-info" href="#" onclick="history.back(-1);" role="button">이전</a>
+            <a class="btn btn-info" href="/board/list" role="button">목록</a>
+            <!--<input class="btn btn-primary" type="button" role="button" onclick="history.back(-1);" value="돌아가기">-->
+        </div>
+        <div class="col-auto">
+            <form name="deleteForm" id="delete-form" th:action="@{'/board/delBoard/' + ${view.id}}" method="GET">
+                <input type="hidden" name="_method" value="delete"/>
+                <!--<button id="delete-btn" type="submit" class="btn btn-danger">삭제</button>-->
+                <a class="btn btn-danger" th:href="@{'/board/delBoard/' + ${view.id}}" role="button">삭제</a>
+                <!--<button id="delete-btn" type="button" class="btn btn-danger" onclick="delForm('/board/delBoard/' + ${view.id});" >삭제</button>-->
+            </form>
+        </div>
+    </div>
+    <div style="margin: 25px 0px 150px 0px">
+        <h3>댓글창</h3>
+        <div style="border-top: 1px black solid; border-bottom: 1px black solid;">
+            <div>
+                <div style="float: left;">
+                    <span><b>댓글 작성자 : 박성혁</b></span>
+                </div>
+                <div style="float: right;">
+                    <span><b>2021/02/04 03:01</b></span>
+                </div>
+            </div>
+
+            <div style="clear: both;">
+                <p>
+                    글 작성은 이 맛이지<br>
+                    근데 이 방법이 맞는걸까?<br>
+                </p>
+            </div>
+        </div>
+        <div>
+            <div style="float: left;width: 85%;height: 100px;">
+                <textarea id="replyText" placeholder="댓글을 입력하세요(1000자 내외로 작성이 가능합니다." style="width: 100%; height: 100%;" maxlength="1000"></textarea>
+            </div>
+            <div style="width: 15%;float: left;">
+                <!--<button style="width: 100%; height: 100px;" th:onclick="|replySave(${view.id})|">등록</button>-->
+                <button id="replySave" style="width: 100%; height: 100px;" >등록</button>
+            </div>
+        </div>
+    </div>
+</div>
+<footer th:insert="layout/fooler.html"></footer>
+<script>
+    /*function delForm() {
+        if(confirm("삭제하시겠습니까?")){
+            href("/board/delBoard/${view.id}");
+
+        }
+    }*/
+    function next(id){
+        location.href ="/board/view/" + id;
+    }
+    function prev(id){
+        location.href ="/board/view/" + id;
+    }
+    $(function (){
+        /*if();
+        $('boardPrev')*/
+    })
+    /*function replySave(id){
+    }*/
+
+    $("#replySave").click(function(){
+        var replyText=$("replyText").val();
+        var bno="${dto.bno}";
+        var param={"replyText" : replyText, "bno" : bno};
+
+        $.ajax({
+            type:'post'
+            , url: 'board/reply/{id}'
+            , data : param
+            , success:function(data){
+                alert("댓글이 등록되었습니다.");
+                $("#replyText").val(data);
+            }
+            , error:function () {
+                alert("Error");
+            }
+            , complete: function () {
+                alert("Complete!");
+            }
+        })
+    })
+
+</script>
+</body>
+</html>

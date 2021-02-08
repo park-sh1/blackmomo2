@@ -1,0 +1,470 @@
+package com.example.blackmomo.controller;
+
+import com.example.blackmomo.domain.*;
+import com.example.blackmomo.service.BoardServiceImpl;
+
+import com.example.blackmomo.service.FileService;
+import com.example.blackmomo.util.MD5Generator;
+import org.apache.catalina.Group;
+import org.apache.catalina.Role;
+import org.apache.catalina.User;
+import org.apache.catalina.UserDatabase;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.NoSuchAlgorithmException;
+import java.util.Iterator;
+import java.util.List;
+
+@Controller
+@RequestMapping(value = "/board")
+public class BoardController {
+
+    @Autowired
+    BoardServiceImpl boardServiceImpl;
+
+    @Autowired
+    FileService fileService;
+
+    /**
+     * <p>게시판 목록</p>
+     * @param vo 페이징 정보
+     * @param model
+     * @param search 검색
+     * @param orderBy 정렬종류
+     * @param orderType 정렬타입
+     * @param searchType 검색타입
+     * @param keyword 검색키워드
+     * @param nowPage 현재페이지 번호
+     * @param cntPerPage 노출목록수
+     * @return 목록으로 이동
+     * @throws Exception
+     */
+    @GetMapping("/list")
+    public String list(Paging vo, Model model, Search search,
+                       @RequestParam(value = "orderBy", required = false) String orderBy,
+                       @RequestParam(value = "orderType", required = false) String orderType,
+                       @RequestParam(value = "searchType", required = false) String searchType,
+                       @RequestParam(value = "keyword", required = false) String keyword,
+                       @RequestParam(value = "nowPage", required = false) String nowPage,
+                       @RequestParam(value = "cntPerPage", required = false) String cntPerPage) throws Exception {
+
+        if (orderBy == null ){
+            search.setOrderBy("id");
+        }
+        if (orderType == null){
+            search.setOrderType("DESC");
+        }
+        search.setSearchType(searchType);
+        search.setKeyword(keyword);
+
+        // 오름차순 내림차순은 추후 진행
+        /*if (orderType == "DESC"){
+
+        }*/
+
+        /*System.out.println("요청값 확인 getOrderBy :::" +  search.getOrderBy());
+        System.out.println("요청값 확인 getOrderType :::" +  search.getOrderType());
+        System.out.println("요청값 확인 searchType :::" +  search.getSearchType());
+        System.out.println("요청값 확인 keyword :::" +  search.getKeyword());*/
+
+        if (nowPage == null && cntPerPage == null) {
+            nowPage = "1";
+            cntPerPage = "5";
+        } else if (nowPage == null) {
+            nowPage = "1";
+        } else if (cntPerPage == null) {
+            cntPerPage = "5";
+        }
+        int total = 0;
+
+        vo = new Paging(total, Integer.parseInt(nowPage), Integer.parseInt(cntPerPage));
+
+        total = boardServiceImpl.countBoard(vo, search);
+
+        vo = new Paging(total, Integer.parseInt(nowPage), Integer.parseInt(cntPerPage));
+
+        List<Board> boardList = boardServiceImpl.findList(vo, search);
+
+        model.addAttribute("paging", vo);
+        model.addAttribute("search", search);
+        model.addAttribute("postList", boardList);
+
+        return "/board/list.html";
+    }
+
+
+    /**
+     * <p>게시판 - new</p>
+     * @param model
+     * @return
+     */
+  /*  @GetMapping("/list2")*/
+    /*public String list2(Paging vo, Model model, @RequestParam(value = "nowPage", required = false)String nowPage, @RequestParam(value = "cntPerPage", required = false)String cntPerPage) throws Exception {
+
+
+        int total = boardServiceImpl.countBoard();
+
+        if (nowPage == null && cntPerPage == null) {
+            nowPage = "1";
+            cntPerPage = "5";
+        } else if (nowPage == null) {
+            nowPage = "1";
+        } else if (cntPerPage == null) {
+            cntPerPage = "5";
+        }
+        vo = new Paging(total, Integer.parseInt(nowPage), Integer.parseInt(cntPerPage));
+
+        Board board = new Board();
+
+        board.setAlign("1");
+        board.setAlignYn("Y");
+        board.setBoardType("1");
+        *//*page.pageCalculate(service.selectBoardCount());*//*
+
+        List<Board> boardList = boardServiceImpl.findList(vo);
+
+        model.addAttribute("paging", vo);
+        model.addAttribute("postList", boardList);
+        return "/board/list.html";
+    }*/
+
+    /**
+     * <p>등록화면</p>
+     * @param model
+     * @return
+     */
+    @GetMapping("/post")
+    public String post(Model model) {
+
+        return "/board/form.html";
+    }
+
+    /**
+     * <p>등록처리</p>
+     * @param files
+     * @param board
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("/post")
+    public String write(@RequestParam("file") MultipartFile files, Board board) throws Exception {
+
+
+        board.setModifier(board.getRegisterer());
+
+        try {
+            if (!"".equals(files.getOriginalFilename())){
+                String origFilename = files.getOriginalFilename();
+
+                String filename = new MD5Generator(origFilename).toString();
+                String savePath = System.getProperty("user.dir") + "\\files";
+                /*String savePath = "C:\\workspace_ij\\demo\\files";*/
+
+                File uploadDir = new File(savePath);
+
+                // 실행되는 위치 'files' 폴더에 파일이 저장됨
+
+                if (!uploadDir.exists()) {
+
+                    // 파일 폴더가 없을 경우 파일 폴더 생성
+                    try{
+                        //.mkdir() / .mkdirs()
+                        uploadDir.mkdir();
+
+                    }
+                    catch(Exception e){
+                        e.getStackTrace();
+                    }
+                }
+
+                // System.currentTimeMillis() = 현재  시간을 구하는 함수
+                filename = System.currentTimeMillis() + "_" + filename + ".png";
+
+                String filePath = savePath + "\\" + filename;
+
+
+
+                File fileDir = new File(filePath);
+
+                files.transferTo(fileDir);
+
+                // 실행되는 위치 'files' 폴더에 파일이 저장됨
+                FileDto fileDto = new FileDto();
+                fileDto.setOrigFilename(origFilename);
+                fileDto.setFilename(filename);
+                fileDto.setFilePath(filePath);
+
+                int fileId = fileService.saveFile(fileDto);
+                board.setFileId(fileId);
+            }
+            else if ("".equals(files.getOriginalFilename())){
+                board.setFileId(0);
+            }
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        boardServiceImpl.findSave(board);
+
+        return "redirect:/board/list";
+    }
+
+    /**
+     * <p>상세화면</p>
+     * @param id
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @GetMapping("/view/{id}")
+    public String view(@PathVariable("id") int id, Model model) throws Exception{
+
+        boardServiceImpl.boardCount(id);
+
+        Board boardDate = boardServiceImpl.findView(id);
+
+        FileDto file = null;
+
+        if(boardDate.getFileId() > 0 ) {
+            file = fileService.selectFile(boardDate.getFileId());
+        }
+
+        // 이전글 정보
+        Board boardPrev = boardServiceImpl.prevSelect(id);
+        // 다음글 정보
+        Board boardNext = boardServiceImpl.nextSelect(id);
+
+        /*System.out.println("이전글 : " + boardPrev.getId());*/
+        /*System.out.println("다음글 : " + boardNext.getId());*/
+
+        model.addAttribute("view", boardDate);
+        model.addAttribute("file", file);
+        model.addAttribute("boardPrev", boardPrev);
+        model.addAttribute("boardNext", boardNext);
+        return "board/view.html";
+    }
+
+    /**
+     * <p>수정화면으로 이동</p>
+     * @param id
+     * @param model
+     * @return
+     */
+    @GetMapping("/edit/{id}")
+    public String boardEdit(@PathVariable("id") int id, Model model) {
+
+        Board board = boardServiceImpl.findSelectEdit(id);
+        FileDto fileDto = fileService.findSelectEdit(board.getFileId());
+        model.addAttribute("edit", board);
+        model.addAttribute("file", fileDto);
+
+        return "board/edit.html";
+    }
+
+    /**
+     * <p>수정처리</p>
+     * @param files
+     * @param id
+     * @param board
+     * @param model
+     * @return
+     */
+    @PostMapping("/edit/{id}")
+    public String Edit(@RequestParam("file") MultipartFile files, @PathVariable("id") int id,Board board, Model model) {
+
+        System.out.println("수정 정보확인 files ::::" + files.getOriginalFilename());
+        System.out.println("수정 정보확인 id ::::" + id);
+        System.out.println("수정 정보확인 board ::::" + board.getFileId());
+
+        try{
+            FileDto file= fileService.fileName(board.getFileId());
+            // 파일 등록
+            if (board.getFileId() == 0){
+                if(!"".equals(files.getOriginalFilename())){
+                    System.out.println("등록 진행");
+                    board.setFileId(fileSave(files, board));
+                }
+            }
+            
+            // 파일을 삭제 및 수정
+            else if(board.getFileId() > 0) {
+                // 파일 삭제
+                if ("".equals(files.getOriginalFilename())) {
+                    System.out.println("삭제 진행");
+                    // 기존파일 삭제
+                    File deleteFolder = new File(file.getFilePath());
+                    deleteFolder.delete();
+                    fileService.fileDelete(board.getFileId());
+                    board.setFileId(0);
+                }
+                // 수정
+                else if(!"".equals(files.getOriginalFilename())){
+                    // 파일명이 등록된 파일명과 다를 경우 기존파일 삭제 후, 새로이 등록된 파일로 등록
+
+                    System.out.println("등록 파일명 확인 :::" + files.getOriginalFilename());
+                    System.out.println("db 파일명 확인 :::" + file.getOrigFilename());
+                    if (!"".equals(file.getOrigFilename())) {
+                        if (file.getOrigFilename() != files.getOriginalFilename()) {
+                            // 기존파일 삭제
+                            File deleteFolder = new File(file.getFilePath());
+                            deleteFolder.delete();
+                            // 새로이 등록된 파일로 등록
+                            board.setFileId(fileSave(files, board));
+                        }
+                    }
+                }
+            }
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        boardServiceImpl.updateAll(board);
+
+        return "redirect:/board/list";
+    }
+
+    private int fileSave(MultipartFile files, Board board) throws Exception {
+        // 새로이 등록된 파일로 등록
+        String origFilename = files.getOriginalFilename();
+        String filename = new MD5Generator(origFilename).toString();
+        String savePath = System.getProperty("user.dir") + "\\files";
+
+        File uploadDir = new File(savePath);
+
+        if(!uploadDir.exists()){
+            try{
+                //.mkdir() / .mkdirs()
+                uploadDir.mkdir();
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+
+        filename = System.currentTimeMillis() + "_" + filename + ".png";
+        String filePath = savePath + "\\" + filename;
+
+        // 실행되는 위치 'files' 폴더에 파일이 저장
+        File fileDir = new File(filePath);
+        files.transferTo(fileDir);
+
+        // db에 파일 정보 등록
+        FileDto fileDto = new FileDto();
+
+        if (board.getFileId() == 0){
+            fileDto.setOrigFilename(origFilename);
+            fileDto.setFilename(filename);
+            fileDto.setFilePath(filePath);
+        }
+        else if (board.getFileId() > 0){
+            fileDto.setId(board.getFileId());
+            fileDto.setOrigFilename(origFilename);
+            fileDto.setFilename(filename);
+            fileDto.setFilePath(filePath);
+        }
+        return fileService.saveFile(fileDto);
+    }
+
+    @GetMapping(value = "delBoard/{id}")
+    public String delBoard(@PathVariable("id") int id)  {
+
+        System.out.println("삭제 번호 확인 :::" + id);
+
+        if (id <= 0 ) {
+            // TODO => 올바르지 않은 접근이라는 메시지를 전달하고, 게시글 리스트로 리다이렉트
+            return "redirect:/board/list";
+        }
+        try{
+            boolean isDeleted = boardServiceImpl.findDel(id);
+            if (isDeleted == false) {
+                // TODO => 게시글 삭제에 실패하였다는 메시지를 전달
+            }
+        } catch (DataAccessException e) {
+            // TODO => 데이터베이스 처리 과정에 문제가 발생하였다는 메시지를 전달
+
+        } catch (Exception e) {
+            // TODO => 시스템에 문제가 발생하였다는 메시지를 전달
+        }
+        return "redirect:/board/list";
+    }
+
+
+    @RequestMapping(value = "/download/{fileId}")
+    public ResponseEntity<InputStreamResource> fileDownload(@PathVariable("fileId")int fileId) throws IOException {
+        System.out.println("값 확인" + fileId);
+
+        FileDto fileDto = fileService.getFile(fileId);
+
+        Path path = Paths.get(fileDto.getFilePath());
+
+        System.out.println("path 정보 ::::::: " + path );
+        InputStreamResource resource = new InputStreamResource(Files.newInputStream(path));
+
+        System.out.println("path 데이터 ::::::: " + path);
+        System.out.println("확인 :::::::: " + (ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileDto.getOrigFilename() + "\"")
+                .body(resource)));
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/json; charset=utf8"))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileDto.getOrigFilename() + "\"")
+                .body(resource);
+
+        /*Resource resource = new InputStreamResource(Files.newInputStream(path));
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileDto.getOrigFilename() + "\"")
+                .body(resource);*/
+    }
+
+    /*public String makeSearch(int page)
+    {
+
+        UriComponents uriComponents =
+                UriComponentsBuilder.newInstance()
+                        .queryParam("page", page)
+                        .queryParam("perPageNum", cri.getPerPageNum())
+                        .queryParam("searchType", ((SearchCriteria)cri).getSearchType())
+                        .queryParam("keyword", encoding(((SearchCriteria)cri).getKeyword()))
+                        .build();
+        return uriComponents.toUriString();
+    }
+
+    private String encoding(String keyword) {
+        if(keyword == null || keyword.trim().length() == 0) {
+            return "";
+        }
+
+        try {
+            return URLEncoder.encode(keyword, "UTF-8");
+        } catch(UnsupportedEncodingException e) {
+            return "";
+        }
+    }*/
+
+    /*public Reply reply(){
+        // 댓글내용, 작성자번호, 작성자명, 작성일시, 수정일시
+        return ;
+    }*/
+
+
+}
