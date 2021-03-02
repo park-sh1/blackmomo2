@@ -9,6 +9,8 @@ import org.apache.catalina.Group;
 import org.apache.catalina.Role;
 import org.apache.catalina.User;
 import org.apache.catalina.UserDatabase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.dao.DataAccessException;
@@ -19,9 +21,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -35,6 +40,8 @@ import java.util.List;
 @Controller
 @RequestMapping(value = "/board")
 public class BoardController {
+
+    private static final Logger logger = LoggerFactory.getLogger(BoardController.class);
 
     @Autowired
     BoardServiceImpl boardServiceImpl;
@@ -65,6 +72,9 @@ public class BoardController {
                        @RequestParam(value = "nowPage", required = false) String nowPage,
                        @RequestParam(value = "cntPerPage", required = false) String cntPerPage) throws Exception {
 
+        logger.info("read");
+
+        // 게시판 목록의 정렬순
         if (orderBy == null ){
             search.setOrderBy("id");
         }
@@ -84,6 +94,7 @@ public class BoardController {
         System.out.println("요청값 확인 searchType :::" +  search.getSearchType());
         System.out.println("요청값 확인 keyword :::" +  search.getKeyword());*/
 
+        // 초기 페이징값 설정
         if (nowPage == null && cntPerPage == null) {
             nowPage = "1";
             cntPerPage = "5";
@@ -104,46 +115,11 @@ public class BoardController {
 
         model.addAttribute("paging", vo);
         model.addAttribute("search", search);
+        model.addAttribute("total", total);
         model.addAttribute("postList", boardList);
 
         return "/board/list.html";
     }
-
-
-    /**
-     * <p>게시판 - new</p>
-     * @param model
-     * @return
-     */
-  /*  @GetMapping("/list2")*/
-    /*public String list2(Paging vo, Model model, @RequestParam(value = "nowPage", required = false)String nowPage, @RequestParam(value = "cntPerPage", required = false)String cntPerPage) throws Exception {
-
-
-        int total = boardServiceImpl.countBoard();
-
-        if (nowPage == null && cntPerPage == null) {
-            nowPage = "1";
-            cntPerPage = "5";
-        } else if (nowPage == null) {
-            nowPage = "1";
-        } else if (cntPerPage == null) {
-            cntPerPage = "5";
-        }
-        vo = new Paging(total, Integer.parseInt(nowPage), Integer.parseInt(cntPerPage));
-
-        Board board = new Board();
-
-        board.setAlign("1");
-        board.setAlignYn("Y");
-        board.setBoardType("1");
-        *//*page.pageCalculate(service.selectBoardCount());*//*
-
-        List<Board> boardList = boardServiceImpl.findList(vo);
-
-        model.addAttribute("paging", vo);
-        model.addAttribute("postList", boardList);
-        return "/board/list.html";
-    }*/
 
     /**
      * <p>등록화면</p>
@@ -236,7 +212,7 @@ public class BoardController {
      */
     @GetMapping("/view/{id}")
     public String view(@PathVariable("id") int id, Model model) throws Exception{
-
+        System.out.println("상세 부분 도착");
         boardServiceImpl.boardCount(id);
 
         Board boardDate = boardServiceImpl.findView(id);
@@ -269,12 +245,15 @@ public class BoardController {
      * @return
      */
     @GetMapping("/edit/{id}")
-    public String boardEdit(@PathVariable("id") int id, Model model) {
+    public String boardEdit(@PathVariable("id") int id, Model model, RedirectAttributes rttr) {
 
         Board board = boardServiceImpl.findSelectEdit(id);
         FileDto fileDto = fileService.findSelectEdit(board.getFileId());
         model.addAttribute("edit", board);
         model.addAttribute("file", fileDto);
+
+/*        rttr.addFlashAttribute("edit", board);
+        rttr.addFlashAttribute("file", fileDto);*/
 
         return "board/edit.html";
     }
@@ -386,8 +365,6 @@ public class BoardController {
     @GetMapping(value = "delBoard/{id}")
     public String delBoard(@PathVariable("id") int id)  {
 
-        System.out.println("삭제 번호 확인 :::" + id);
-
         if (id <= 0 ) {
             // TODO => 올바르지 않은 접근이라는 메시지를 전달하고, 게시글 리스트로 리다이렉트
             return "redirect:/board/list";
@@ -396,12 +373,15 @@ public class BoardController {
             boolean isDeleted = boardServiceImpl.findDel(id);
             if (isDeleted == false) {
                 // TODO => 게시글 삭제에 실패하였다는 메시지를 전달
+                System.out.println("게시글 삭제에 실패하였습니다. 재확인하세요");
             }
         } catch (DataAccessException e) {
             // TODO => 데이터베이스 처리 과정에 문제가 발생하였다는 메시지를 전달
+            System.out.println("오류가 발생했습니다 : "+e.getMessage());
 
         } catch (Exception e) {
             // TODO => 시스템에 문제가 발생하였다는 메시지를 전달
+            System.out.println("오류가 발생했습니다 : "+e.getMessage());
         }
         return "redirect:/board/list";
     }
@@ -461,10 +441,87 @@ public class BoardController {
         }
     }*/
 
-    /*public Reply reply(){
+    /* 댓글목록 */
+    @RequestMapping("/reply/list")
+    public ModelAndView replyList(int bno, ModelAndView mav) throws Exception {
+
+        Board boardDate = boardServiceImpl.findView(bno);
+        FileDto file = null;
+
+        if(boardDate.getFileId() > 0 ) {
+            file = fileService.selectFile(boardDate.getFileId());
+        }
+
         // 댓글내용, 작성자번호, 작성자명, 작성일시, 수정일시
+        int replyTotal = 0; // 댓글 수
+        replyTotal = boardServiceImpl.count(bno);
+
+        List<Reply> replyList = boardServiceImpl.list(bno); //댓글 목록
+        mav.setViewName("/board/reply"); //뷰의 이름
+        mav.addObject("replyList", replyList); //뷰에 전달할 데이터 저장
+        mav.addObject("replyTotal", replyTotal); //뷰에 전달할 댓글수
+        mav.addObject("file", file);
+        mav.addObject("view", boardDate);
+        return mav; //뷰로 이동
+    }
+
+    //댓글 목록을 ArrayList로 리턴
+    /*@RequestMapping("/list_json")
+    public List<Reply> list_json(int bno){ return boardServiceImpl.list(bno); }*/
+
+    /**
+     * <p>댓글등록</p>
+     * @param dto
+     * @param session
+     */
+    @RequestMapping("/reply/insert") //세부적인 url pattern
+    public void insert( @ModelAttribute Reply dto, HttpSession session, ModelAndView mav) {
+
+        /*String userId = (String) session.getAttribute("userId");
+        dto.setReplyer(userId);*/
+
+        String userId = "userId";
+        dto.setReplyer(userId);
+
+        System.out.println("등록 도착 ::: " + dto);
+
+        //댓글 작성자 아이디
+        //현재 접속중인 사용자 아이디
+       /* String userid=(String)session.getAttribute("userid");*/
+        String name = "작성자 빡";
+        dto.setName(name);
+
+        System.out.println("작성자 ::: " + dto.getReplyer());
+
+        //댓글이 테이블에 저장됨
+        boardServiceImpl.create(dto);
+        System.out.println("확인" + dto);
+        //jsp 페이지로 가거나 데이터를 리턴하지 않음
+    }
+
+   /* @GetMapping("/reply/delReply/{rno}")
+    public String delReply(@PathVariable("rno") int rno){
+
+        if(rno <= 0) {
+            return "redirect:/board/view"
+        }
         return ;
     }*/
 
+    @PostMapping("/reply/update")
+    public void replyModify(@ModelAttribute Reply dto, HttpSession session){
+        String userId = "userId";
+        dto.setReplyer(userId);
 
+        System.out.println("등록 도착 ::: " + dto);
+
+        //댓글 작성자 아이디
+        //현재 접속중인 사용자 아이디
+        /* String userid=(String)session.getAttribute("userid");*/
+        String name = "작성자 빡";
+        dto.setName(name);
+
+        //댓글이 테이블에 저장됨
+        boardServiceImpl.modify(dto);
+    }
 }

@@ -2,6 +2,7 @@ package com.example.blackmomo.mapper;
 
 import com.example.blackmomo.domain.Board;
 import com.example.blackmomo.domain.Paging;
+import com.example.blackmomo.domain.Reply;
 import com.example.blackmomo.domain.Search;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,11 +41,21 @@ public interface BoardMapper {
 
     // 다음글 정보
     Board nextSelect(int id);
-    // 상세
 
-    // 수정
+    // 댓글 조회
+    public List<Reply> replyList(int bno);
 
-    // 삭제
+    //댓글 수
+    public int count(int bno);
 
-    //
+    // 댓글 등록
+    public void create(Reply dto);
+
+    public void modify(Reply dto);
+
+    // 댓글 수정
+
+
+    // 댓글 삭제
+
 }

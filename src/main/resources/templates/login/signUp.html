@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+</head>
+<body>
+<header th:insert="layout/header.html"></header>
+<div>
+    <div style="width:80%; margin: 10px  auto;">
+        <div style="width:800px;">
+            <form action="/login/signUp" method="post">
+                <h1>필수 정보</h1>
+                <table style="width: 100%;">
+                    <colgroup>
+                        <col width="20%">
+                        <col width="*">
+                    </colgroup>
+                    <tbody id="necessary">
+                        <!--<tr>
+                            <th colspan="2"><h1>필수 정보</h1></th>
+                        </tr>-->
+                        <!-- 회원 id -->
+                        <tr>
+                            <th>*아이디</th>
+                            <td><input type="text" id="id" placeholder="아이디를 입력해 주세요."><button type="button" id="doubleCheck" value="중복확인" style="margin: 0px 10px;">중복확인</button></td>
+                        </tr>
+                        <!-- 패스워드 -->
+                        <tr>
+                            <th>*패스워드</th>
+                            <td><input placeholder="패스워드를 입력하세요.">
+                                <!--<span th:if=""></span>-->
+                            </td>
+                        </tr>
+                        <!-- 패스워드 확인-->
+                        <tr>
+                            <th>*패스워드 확인</th>
+                            <td><input placeholder="패스워드">
+                                <!--<span th:if=""></span>-->
+                            </td>
+                        </tr>
+                        <!-- 이름 -->
+                        <tr>
+                            <th>*이름</th>
+                            <td><input placeholder="이름을 입력해주세요."></td>
+                        </tr>
+                        <!-- 닉네임 -->
+                        <tr>
+                            <th><abbr title="아이디 대신 사용하실 닉네임입니다. <br> 닉네임을 입력하지 않으시면 아이디가 노출이 됩니다.">닉네임</abbr></th>
+                            <td>
+                                <input>
+                                <p>* 아이디 대신 사용하실 닉네임입니다.</p>
+                                <p>* 닉네임을 입력하지 않으시면 아이디가 노출이 됩니다.</p>
+                            </td>
+                        </tr>
+                        <!-- 우편번호 -->
+                        <tr>
+                            <th>*우편번호</th>
+                            <td><input type="text" maxlength="3"> - <input type="text" maxlength="3"></td>
+                        </tr>
+                        <!-- 기본 주소 -->
+                        <tr>
+                            <th>*기본 주소</th>
+                            <td><input type="text"><button type="button" >주소검색</button></td>
+                        </tr>
+                        <!-- 상세 주소 -->
+                        <tr>
+                            <th>*상세 주소</th>
+                            <td><input></td>
+                        </tr>
+                        <!-- 휴대폰번호 -->
+                        <tr>
+                            <th>*휴대폰번호</th>
+                            <td>
+                                <select>
+                                    <option>010</option>
+                                    <option>011</option>
+                                    <option>016</option>
+                                    <option>017</option>
+                                    <option>018</option>
+                                    <option>019</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <!-- 성별 -->
+                        <tr>
+                            <th>*성별</th>
+                            <td><span>남성123</span><input type="radio"> | <span>여성</span><input type="radio"></td>
+                        </tr>
+                        <!-- 생년월일 -->
+                        <tr>
+                            <th>*생년월일</th>
+                            <td><input><span>년</span><input><span>월</span><input><span>일</span></td>
+                        </tr>
+                        <tr>
+                            <th>이메일 수신여부</th>
+                            <td><button>동의</button><button>거부</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table>
+                    <colgroup>
+                        <col width="20%">
+                        <col width="*">
+                    </colgroup>
+                    <tbody id="optional">
+                    <tr>
+                        <th colspan="2"><h1>선택 정보</h1></th>
+                    </tr>
+                        <tr>
+                            <th>관심분야1</th>
+                            <td>
+                                <select>
+                                    <option>-- 관심분야 --</option>
+                                    <option>공포</option>
+                                    <option>심리</option>
+                                    <option>다큐</option>
+                                    <option>스릴러</option>
+                                    <option>코믹</option>
+                                    <option>무협</option>
+                                    <option>전쟁</option>
+                                    <option>판타지</option>
+                                    <option>액션</option>
+                                    <option>멜로</option>
+                                    <option>성인</option>
+                                    <option>드라마</option>
+                                    <option>기타</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>관심분야2</th>
+                            <td>
+                                <select>
+                                    <option>-- 관심분야 --</option>
+                                    <option>공포</option>
+                                    <option>심리</option>
+                                    <option>다큐</option>
+                                    <option>스릴러</option>
+                                    <option>코믹</option>
+                                    <option>무협</option>
+                                    <option>전쟁</option>
+                                    <option>판타지</option>
+                                    <option>액션</option>
+                                    <option>멜로</option>
+                                    <option>성인</option>
+                                    <option>드라마</option>
+                                    <option>기타</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>관심분야3</th>
+                            <td>
+                                <select>
+                                    <option>-- 관심분야 --</option>
+                                    <option>공포</option>
+                                    <option>심리</option>
+                                    <option>다큐</option>
+                                    <option>스릴러</option>
+                                    <option>코믹</option>
+                                    <option>무협</option>
+                                    <option>전쟁</option>
+                                    <option>판타지</option>
+                                    <option>액션</option>
+                                    <option>멜로</option>
+                                    <option>성인</option>
+                                    <option>드라마</option>
+                                    <option>기타</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody id="terms">
+                        <tr>
+                            <th>약관동의</th>
+                            <td><textarea th:insert="/login/terms.html"></textarea></td>
+                        </tr>
+                        <tr>
+                            <th>개인정보 수집 <br>및 이용동의</th>
+                            <td><textarea th:insert="/login/terms2.html"></textarea></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button type=""></button>
+            </form>
+        </div>
+    </div>
+</div>
+    <!--
+    private int id; // 회원id
+    private String pass;// 패스워드(비밀번호)
+    private String pass2;// 패스워드2(비밀번호확인)
+    private String name;// 이름
+    private String nickname;// 닉네임(별명)
+    private String zipCode;// 우편번호
+    private String baseAddress;// 주소
+    private String DetailedAddress;// 상세주소
+    private String phoneNumber;// 휴대폰번호
+    private String gender;// 성별
+    private String dateOfBirth;// 생년월일
+    private String interest1;// 관심분야1
+    private String interest2;// 관심분야2
+    private String interest3;// 관심분야3
+    private String managerYn;// 관리자여부
+    private String certificationYn;// 인증여부
+    -->
+<!--<footer th:insert="layout/footer.html"></footer>-->
+<fooler th:insert="layout/fooler.html"></fooler>
+<script type="text/javascript">
+    $("#doubleCheck").click(function (){
+       alert("중복확인");
+       var id = $("#id").val();
+       alert("id ::: " + id);
+       $.ajax({
+           type :'post'
+           , url : '/login/doubleCheck'
+           , data : id
+           , success:function(data){
+
+           }
+       })
+    });
+</script>
+</body>
+</html>

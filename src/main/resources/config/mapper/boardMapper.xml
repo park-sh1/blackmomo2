@@ -3,19 +3,31 @@
 <mapper namespace="com.example.blackmomo.mapper.BoardMapper">
 
     <resultMap type="com.example.blackmomo.domain.Board" id="boardResultMap">
-        <id column="id" property="id"/>
-        <result column="title" property="title"/>
-        <result column="content" property="content"/>
-        <result column="registerer" property="registerer"/>
+        <id     column="id"            property="id"/>
+        <result column="title"         property="title"/>
+        <result column="content"       property="content"/>
+        <result column="registerer"    property="registerer"/>
         <result column="register_date" property="registerDate"/>
-        <result column="modifier" property="modifier"/>
+        <result column="modifier"      property="modifier"/>
         <result column="modified_date" property="modifiedDate"/>
-        <result column="file_id" property="fileId"/>
-        <result column="expose_yn" property="exposeYn"/>
-        <result column="use_yn" property="useYn"/>
-        <result column="delete_yn" property="deleteYn"/>
-        <result column="board_type" property="boardType"/>
-        <result column="board_count" property="boardCount"/>
+        <result column="file_id"       property="fileId"/>
+        <result column="expose_yn"     property="exposeYn"/>
+        <result column="use_yn"        property="useYn"/>
+        <result column="delete_yn"     property="deleteYn"/>
+        <result column="board_type"    property="boardType"/>
+        <result column="board_count"   property="boardCount"/>
+    </resultMap>
+
+    <resultMap type="com.example.blackmomo.domain.Reply" id="replyResultMap">
+        <id     column="rno"          property="rno"/>
+        <result column="bno"          property="bno"/>
+        <result column="reply_text"   property="replyText"/>
+        <result column="replyer"      property="replyer"/>
+        <result column="name"         property="name"/>
+        <result column="wri_dt"       property="wriDt"/>
+        <result column="modi_dt"      property="modiDt"/>
+        <result column="secret_reply" property="secretReply"/>
+        <result column="delete_yn"    property="deleteYn"/>
     </resultMap>
 
     <!-- 게시판 컬럼 -->
@@ -34,6 +46,19 @@
         ,board_type
         ,board_count
     </sql>
+
+    <sql id="replyColumn">
+        rno
+        ,bno
+        ,reply_text
+        ,replyer
+        ,name
+        ,wri_dt
+        ,modi_dt
+        ,secret_reply
+        ,delete_yn
+    </sql>
+
 
     <!-- 검색조건 -->
     <sql id="search">
@@ -101,7 +126,7 @@
 
     <!-- 목록 -->
     <select id="boardList" resultMap="boardResultMap">
-        SELECT bo.*
+        SELECT bo.*, (select count(*) from reply where bno = bo.id) as recnt
         FROM (
                  SELECT @rownum:=@rownum+1 RN, bo.*
                  FROM (
@@ -173,12 +198,14 @@
         where id = #{id}
     </update>
 
+    <!-- 게시글 삭제 -->
     <update id="delete" parameterType="int">
         update board
         set delete_yn = 'Y'
         where id = #{id};
     </update>
 
+    <!-- 이전글 조회 -->
     <select id="prevSelect" parameterType="int" resultMap="boardResultMap">
         SELECT id, title FROM (select @num := @num + 1 as num, id, title
         from board b,
@@ -192,6 +219,7 @@
         ]]>
     </select>
 
+    <!-- 다음글 조회 -->
     <select id="nextSelect" resultMap="boardResultMap">
         SELECT id, title FROM (select @num := @num + 1 as num, id, title
         from board b,
@@ -201,6 +229,46 @@
         and expose_yn = 'Y'
         order by id) b WHERE id > #{id} ORDER BY id LIMIT 1
     </select>
+
+    <!-- ============================================================================== -->
+    <!-- 댓글 -->
+
+    <!-- 댓글 수 -->
+    <select id="count" resultType="int">
+        select COUNT(*) from reply where bno = #{bno}
+    </select>
+
+    <!-- 댓글 조회 -->
+    <select id="replyList"  resultMap="replyResultMap">
+        select * from reply where bno = #{bno} order by rno asc
+    </select>
+
+    <!-- 댓글 등록 -->
+    <insert id="create">
+        insert into reply(<include refid="replyColumn" />)
+        value
+        ((select IFNULL(max(rno)+'1', '1') from reply r)
+        ,#{bno}
+        ,#{replyText}
+        ,#{replyer}
+        ,#{name}
+        ,sysdate()
+        ,sysdate()
+        ,#{secretReply}
+        ,'Y')
+    </insert>
+
+    <!-- 댓글 수정 -->
+    <update id="modify">
+        update reply
+        set reply_text = #{replyText}
+          , modi_dt = sysdate()
+        where rno = #{rno} and bno = #{bno}
+    </update>
+
+    <!-- 댓글 삭제  -->
+    <!--<delete id="">
+    </delete>-->
 
 
 </mapper>

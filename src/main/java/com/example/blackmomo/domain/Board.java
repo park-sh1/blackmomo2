@@ -35,6 +35,7 @@ public class Board {
     private String        exposeYn; // 노출여부
     private String        useYn;    // 사용여부
     private String        deleteYn; // 삭제여부
+    private int           recnt;    // 게시글의 댓글수
 
     /*    private String author; // 작성자*/
 }

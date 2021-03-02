@@ -37,23 +37,35 @@
                     </div>
                 </div>
             </div>
-            <div class="form-group row">
+            <!--<div class="form-group row">
                 <label for="topFixedYn" class="col-sm-2 col-form-label"><strong>상단고정여부</strong></label>
                 <div class="col-sm-10">
                     <div class="custom-file" id="inputFile">
-                        <div class="orderBy" style="border: 1px black solid; float: left; width: 100px;height:35px;padding: 5px; margin: 0px 10px;">
-                            <span>상단고정</span>
-                            <input type="radio" id="topFixedYn" name="topFixedYn" value="Y">
-                        </div>
+                        <th:block th:if="${edit?.topFixedYn} == 'Y'">
+                            <div class="orderBy" style="border: 1px black solid; float: left; width: 100px;height:35px;padding: 5px; margin: 0px 10px;">
+                                <span>상단고정</span>
+                                <input type="radio" id="topFixedYn" name="topFixedYn" value="Y" checked>
+                            </div>
 
-                        <div class="orderBy" style="border: 1px black solid; float: left; width: 100px;height:35px;padding: 5px; text-align: center">
-                            <span>비고정</span>
-                            <input type="radio" id="topFixedYn" name="topFixedYn" value="N">
-                        </div>
+                            <div class="orderBy" style="border: 1px black solid; float: left; width: 100px;height:35px;padding: 5px; text-align: center">
+                                <span>비고정</span>
+                                <input type="radio" id="topFixedYn" name="topFixedYn" value="N">
+                            </div>
+                        </th:block>
+                        <th:block th:if="${edit?.topFixedYn} == 'N'">
+                            <div class="orderBy" style="border: 1px black solid; float: left; width: 100px;height:35px;padding: 5px; margin: 0px 10px;">
+                                <span>상단고정</span>
+                                <input type="radio" id="topFixedYn" name="topFixedYn" value="Y">
+                            </div>
+
+                            <div class="orderBy" style="border: 1px black solid; float: left; width: 100px;height:35px;padding: 5px; text-align: center">
+                                <span>비고정</span>
+                                <input type="radio" id="topFixedYn" name="topFixedYn" value="N" checked>
+                            </div>
+                        </th:block>
                     </div>
                 </div>
-
-            </div>
+            </div>-->
             <div style="text-align: end;" >
                 <input class="btn btn-primary" type="button" onclick="update();" value="수정하기">
                 <input class="btn btn-primary" type="reset" value="초기화">
@@ -119,6 +131,7 @@
             el[i].checked = false;
         }*/
     }
+    // 상단고정여부 버튼 on/off
 </script>
 </body>
 </html>
