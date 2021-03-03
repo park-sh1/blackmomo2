@@ -78,4 +78,9 @@ public class BoardServiceImpl {
     public void create(Reply dto) { boardMapper.create(dto); }
 
     public void modify(Reply dto) { boardMapper.modify(dto); }
+
+    // 댓글 삭제
+    public void replyDelete(Reply dto) {
+        boardMapper.replyDelete(dto);
+    }
 }

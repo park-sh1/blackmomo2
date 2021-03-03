@@ -240,7 +240,7 @@
 
     <!-- 댓글 조회 -->
     <select id="replyList"  resultMap="replyResultMap">
-        select * from reply where bno = #{bno} order by rno asc
+        select * from reply where bno = #{bno} and delete_yn = 'Y' order by rno asc
     </select>
 
     <!-- 댓글 등록 -->
@@ -267,8 +267,9 @@
     </update>
 
     <!-- 댓글 삭제  -->
-    <!--<delete id="">
-    </delete>-->
-
-
+    <update id="replyDelete">
+        update reply
+        set delete_yn = 'N'
+        where rno = #{rno} and bno = #{bno}
+    </update>
 </mapper>

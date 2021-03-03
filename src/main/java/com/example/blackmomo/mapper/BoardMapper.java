@@ -51,11 +51,10 @@ public interface BoardMapper {
     // 댓글 등록
     public void create(Reply dto);
 
+    // 댓글 수정
     public void modify(Reply dto);
 
-    // 댓글 수정
-
-
     // 댓글 삭제
+    public void replyDelete(Reply dto);
 
 }

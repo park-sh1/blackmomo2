@@ -524,4 +524,13 @@ public class BoardController {
         //댓글이 테이블에 저장됨
         boardServiceImpl.modify(dto);
     }
+
+    @PostMapping("/reply/replyDelete")
+    public void replyDelete(@ModelAttribute Reply dto, HttpSession session){
+        String userId = "userId";
+        dto.setReplyer(userId);
+        System.out.println("삭제 도착 ::: " + dto);
+
+        boardServiceImpl.replyDelete(dto);
+    }
 }
