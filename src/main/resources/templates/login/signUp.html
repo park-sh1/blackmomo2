@@ -23,26 +23,32 @@
                         <!-- 회원 id -->
                         <tr>
                             <th>*아이디</th>
-                            <td><input type="text" id="id" placeholder="아이디를 입력해 주세요."><button type="button" id="doubleCheck" value="중복확인" style="margin: 0px 10px;">중복확인</button></td>
+                            <td>
+                                <input type="text" id="id" name="id" maxlength="50" onkeydown="inputIdChk()">
+                                <input type="button" value="중복확인" onclick="openIdChk()">
+                                <input type="hidden" name="idDuplication" value="idUncheck">
+
+                                <!--<input type="text" id="id" placeholder="아이디를 입력해 주세요."><button type="button" id="doubleCheck" value="중복확인" style="margin: 0px 10px;">중복확인</button>-->
+                            </td>
                         </tr>
                         <!-- 패스워드 -->
                         <tr>
                             <th>*패스워드</th>
-                            <td><input placeholder="패스워드를 입력하세요.">
+                            <td><input placeholder="패스워드를 입력하세요." id="pass" name="pass">
                                 <!--<span th:if=""></span>-->
                             </td>
                         </tr>
                         <!-- 패스워드 확인-->
                         <tr>
                             <th>*패스워드 확인</th>
-                            <td><input placeholder="패스워드">
+                            <td><input placeholder="한번더 패스워드를 입력하세요" id="passCheck" name="passCheck">
                                 <!--<span th:if=""></span>-->
                             </td>
                         </tr>
                         <!-- 이름 -->
                         <tr>
                             <th>*이름</th>
-                            <td><input placeholder="이름을 입력해주세요."></td>
+                            <td><input id="name" name="name" placeholder="이름을 입력해주세요."></td>
                         </tr>
                         <!-- 닉네임 -->
                         <tr>
@@ -56,23 +62,23 @@
                         <!-- 우편번호 -->
                         <tr>
                             <th>*우편번호</th>
-                            <td><input type="text" maxlength="3"> - <input type="text" maxlength="3"></td>
+                            <td><input type="text" id="zipCode1" maxlength="3"> - <input type="text" id="zipCode2" maxlength="3"></td>
                         </tr>
                         <!-- 기본 주소 -->
                         <tr>
                             <th>*기본 주소</th>
-                            <td><input type="text"><button type="button" >주소검색</button></td>
+                            <td><input type="text" id="baseAddress" name="baseAddress"><button type="button" >주소검색</button></td>
                         </tr>
                         <!-- 상세 주소 -->
                         <tr>
                             <th>*상세 주소</th>
-                            <td><input></td>
+                            <td><input type="text" id="DetailedAddress" name="DetailedAddress"></td>
                         </tr>
                         <!-- 휴대폰번호 -->
                         <tr>
                             <th>*휴대폰번호</th>
                             <td>
-                                <select>
+                                <select id="pNumber1">
                                     <option>010</option>
                                     <option>011</option>
                                     <option>016</option>
@@ -80,25 +86,34 @@
                                     <option>018</option>
                                     <option>019</option>
                                 </select>
+                                -
+                                <input type="text" maxlength="4">
+                                -
+                                <input type="text" maxlength="4">
+                                <input type="button" value="휴대폰체크" onclick="phoneChk()">
                             </td>
                         </tr>
                         <!-- 성별 -->
                         <tr>
                             <th>*성별</th>
-                            <td><span>남성123</span><input type="radio"> | <span>여성</span><input type="radio"></td>
+                            <td><span>남성</span><input type="radio"> | <span>여성</span><input type="radio"></td>
                         </tr>
                         <!-- 생년월일 -->
                         <tr>
                             <th>*생년월일</th>
-                            <td><input><span>년</span><input><span>월</span><input><span>일</span></td>
+                            <td>
+                                <input id="birthYy"><span>년</span>
+                                <input id="birthMm"><span>월</span>
+                                <input id="birthDd"><span>일</span>
+                            </td>
                         </tr>
                         <tr>
                             <th>이메일 수신여부</th>
-                            <td><button>동의</button><button>거부</button></td>
+                            <td><input type="radio">동의</input><input type="radio">거부</input></td>
                         </tr>
                     </tbody>
                 </table>
-                <table>
+                <table style="width: 100%;">
                     <colgroup>
                         <col width="20%">
                         <col width="*">
@@ -174,15 +189,23 @@
                     <tbody id="terms">
                         <tr>
                             <th>약관동의</th>
-                            <td><textarea th:insert="/login/terms.html"></textarea></td>
+                            <td>
+                                <textarea th:insert="/login/terms.html" style="width:100%;"></textarea>
+                                <input type="checkbox" value="동의">
+                            </td>
                         </tr>
                         <tr>
                             <th>개인정보 수집 <br>및 이용동의</th>
-                            <td><textarea th:insert="/login/terms2.html"></textarea></td>
+                            <td>
+                                <textarea th:insert="/login/terms2.html" style="width:100%;"></textarea>
+                                <input type="checkbox" value="동의">
+                            </td>
                         </tr>
                     </tbody>
                 </table>
-                <button type=""></button>
+                <input type="button" onclick="checkValue()" value="등록하기">
+                <input type="button" onclick="" value="취소">
+                <button type="reset">초기화</button>
             </form>
         </div>
     </div>
@@ -217,10 +240,71 @@
            , url : '/login/doubleCheck'
            , data : id
            , success:function(data){
-
+               if('Y' == data.id){
+                   alert("중복 아이디입니다. 다른 아이디를 입력해주세요.")
+               }
+               else if('N' == data.id){
+                   alert("중복 아이디가 아닙니다.")
+               }
            }
        })
     });
+    // 회원가입 화면의 입력값들을 검사(id,pw, pw 일치여부, 이름 )
+    function checkValue(){
+        var form = document.userInfo;
+
+        if(!form.id.value){
+            alert("아이디를 입력하세요.");
+            // 아이디 입력칸으로 포커스 작성 예정
+            form.id.focus();
+            return false;
+        }
+        if(form.idDuplication.value != "idCheck"){
+            alert("아이디 중복체크를 해주세요.");
+            return false;
+        }
+        if(!form.pass.value){
+            alert("비밀번호를 입력하세요.");
+            form.pass.focus();
+            return false;
+        }
+        if(form.passCheck.value != form.pass.value){
+            alert("비밀번호가 다릅니다. 다시 입력해주세요");
+            form.passCheck.focus();
+            return false;
+        }
+        // 비밀번호와 비밀번호 확인에 입력된 값이 동일한지 확인
+        if(form.pass.value != form.passCheck.value){
+            alert("비밀번호를 동일하게 입력해주세요.");
+            return false;
+        }
+        if(!form.name.value){
+            alert("이름을 입력하세요.");
+            return false;
+        }
+        if(!form.birthyy.value){
+            alert("년도를 입력하세요.");
+            return false;
+        }
+        if(isNaN(form.birthyy.value)){
+            alert("년도는 숫자만 입력가능합니다.");
+            return false;
+        }
+
+    }
+
+    // 아이디 중복체크 화면 open
+    function openIdChk(){
+
+        window.name = "parentForm";
+        window.open("member/IdCheckForm.html", "chkForm", "width=500, height=300, resizable = no, scrolbars = no");
+    }
+
+    // 아이디 입력창에 값 입력시 hidden에 idUncheck를 세팅한다.
+    // 이렇게 하는 이유는 중복체크 후 다시 아이디 차이 새로운 아이디를 입력 했을때 다시 중복체크를 하도록 한다.
+    function inputIdChk(){
+        document.userInfo.idDuplication.value = "idUncheck";
+    }
 </script>
 </body>
 </html>

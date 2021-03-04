@@ -31,7 +31,10 @@ public class LoginController {
     @GetMapping("/signUp")
     public String signUp() { return "/login/signUp.html";}
 
-
+    @PostMapping("/doubleCheck")
+    public String doubleCheck(){
+        return null;
+    }
 
 
     /**

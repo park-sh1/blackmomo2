@@ -143,7 +143,8 @@
                     <!-- 상세화면으로 이동 -->
                     <td>
                         <a th:href="@{'/board/view/' + ${post?.id}}">
-                            <span th:text="@{${post?.title} + '(' +${post?.recnt} + ')'}"></span>
+                            <span th:text="${post?.title}"></span>
+                            <span th:if="${post?.recnt} > 0" th:text="@{'(' +${post?.recnt} + ')'}"></span>
                         </a>
                     </td>
                     <!-- 등록일시과 수정일시가 같을 경우 등록자 -->
@@ -248,7 +249,7 @@
                 + "&keyword=" + $('#keyword').val()
                 + "&orderBy=" + idx
                 + "&orderType=" + $('#orderType').val()
-                + "&nowPage=" + pageNo
+                + "&nowPage=" + 1
                 + "&cntPerPage="+nowPaging;
         }else if(nowPaging == 10){
             location.href="/board/list?"
@@ -256,7 +257,7 @@
                 + "&keyword=" + $('#keyword').val()
                 + "&orderBy=" + idx
                 + "&orderType=" + $('#orderType').val()
-                + "&nowPage=" + pageNo
+                + "&nowPage=" + 1
                 + "&cntPerPage="+nowPaging;
         }else if(nowPaging == 15){
             location.href="/board/list?"
@@ -264,7 +265,7 @@
                 + "&keyword=" + $('#keyword').val()
                 + "&orderBy=" + idx
                 + "&orderType=" + $('#orderType').val()
-                + "&nowPage=" + pageNo
+                + "&nowPage=" + 1
                 + "&cntPerPage="+nowPaging;
         }else if(nowPaging == 20){
             location.href="/board/list?"
@@ -272,7 +273,7 @@
                 + "&keyword=" + $('#keyword').val()
                 + "&orderBy=" + idx
                 + "&orderType=" + $('#orderType').val()
-                + "&nowPage=" + pageNo
+                + "&nowPage=" + 1
                 + "&cntPerPage="+nowPaging;
         }
     };

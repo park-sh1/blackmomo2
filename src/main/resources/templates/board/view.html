@@ -11,17 +11,20 @@
         <h3 class="card-title" th:text="@{ ${view.id} + '번 ' + '자유게시판 - ' + ${view.title}}"></h3>
     </div>
     <div style="padding: 15px 0px;">
-        <div style="width: 30%;height: 30%;float: left;">
-            <img src="/img/animalImage/이미지4_우꼈소.PNG" alt="대표이미지" style="width: 100%; height: 100%;">
+        <!-- 작성/수정자의 프로필사진 -->
+        <div style="float: left;">
+            <img src="/img/animalImage/이미지4_우꼈소.PNG" alt="대표이미지" style="width: 50px; height: 50px;">
         </div>
         <div>
             <!--<p class="card-text"><small class="text-muted" th:text="@{' 작성자 : ' +${view.author} + ' / ' + '작성일자 : ' +  ${#temporals.format(view.createdDate, 'yyyy-MM-dd HH:mm')}}"></small></p>-->
             <th:block th:if="${view.registerDate == view.modifiedDate}">
-                <p class="card-text" th:text="@{' 최종작성자 : ' +${view.registerer} + ' / ' + '작성일자 : ' +  ${#temporals.format(view.registerDate, 'yyyy-MM-dd HH:mm:ss')}}"><small class="text-muted"></small></p>
+                <p class="card-text" th:text="@{' 최종작성자 : ' +${view.registerer}}" style="matgin-bottom:0;"></p>
+                <p class="card-text" th:text="@{'작성일자 : ' +  ${#temporals.format(view.registerDate, 'yyyy-MM-dd HH:mm:ss')}}"></p>
                 <!--<p class="card-text" th:text="@{' 최종작성자 : ' +${view.registerer} + ' / ' + '작성일자 : ' +  ${view.registerDate}}"><small class="text-muted"></small></p>-->
             </th:block>
             <th:block th:if="${view.registerDate != view.modifiedDate}">
-                <p class="card-text" th:text="@{' 최종작성자 : ' +${view.modifier} + ' / ' + '작성일자 : ' +  ${#temporals.format(view.modifiedDate, 'yyyy-MM-dd HH:mm:ss')}}"><small class="text-muted"></small></p>
+                <p class="card-text" th:text="@{' 최종작성자 : ' +${view.modifier}}" style="matgin-bottom:0;"></p>
+                <p class="card-text" th:text="@{'작성일자 : ' +  ${#temporals.format(view.modifiedDate, 'yyyy-MM-dd HH:mm:ss')}}"></p>
             </th:block>
         </div>
     </div>

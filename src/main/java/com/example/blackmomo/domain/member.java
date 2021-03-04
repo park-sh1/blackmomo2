@@ -10,7 +10,7 @@ public class member {
 
     private int id; // 회원id
     private String pass;// 패스워드(비밀번호)
-    private String pass2;// 패스워드2(비밀번호확인)
+    private String passCheck;// 패스워드2(비밀번호확인)
     private String name;// 이름
     private String nickname;// 닉네임(별명)
     private String zipCode;// 우편번호

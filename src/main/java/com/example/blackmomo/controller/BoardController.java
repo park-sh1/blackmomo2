@@ -81,8 +81,17 @@ public class BoardController {
         if (orderType == null){
             search.setOrderType("DESC");
         }
-        search.setSearchType(searchType);
-        search.setKeyword(keyword);
+        if (searchType == null){
+            search.setSearchType("all");
+        }else if (searchType != null){
+            search.setSearchType(searchType);
+        }
+        if (keyword == null){
+            search.setKeyword("");
+        }else if (keyword != null){
+            search.setKeyword(keyword);
+        }
+       /* search.setKeyword(keyword);*/
 
         // 오름차순 내림차순은 추후 진행
         /*if (orderType == "DESC"){
