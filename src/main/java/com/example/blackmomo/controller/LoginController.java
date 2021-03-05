@@ -1,9 +1,9 @@
 package com.example.blackmomo.controller;
 
+import com.example.blackmomo.domain.Member;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping(value = "/login")
@@ -63,5 +63,21 @@ public class LoginController {
     @GetMapping("/login/idFind")
     public String pwFind2() {
         return "/login/idFind.html";
+    }
+
+    @GetMapping("/idCheckForm")
+    public String idCheckForm(){
+
+
+
+        return "/login/idCheckForm.html";
+    }
+
+    @PostMapping("/MemberIdCheckAction")
+    public String MemberIdCheckAction(@ModelAttribute Member member){
+
+        System.out.println("중복체크 서버에 도착 ::: " + member);
+        
+        return null;
     }
 }

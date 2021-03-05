@@ -6,13 +6,14 @@ import lombok.Setter;
 //회원 정보
 @Setter
 @Getter
-public class member {
+public class Member {
 
     private int id; // 회원id
     private String pass;// 패스워드(비밀번호)
     private String passCheck;// 패스워드2(비밀번호확인)
     private String name;// 이름
     private String nickname;// 닉네임(별명)
+    private String email;// 이메일(최대 20자 제한)
     private String zipCode;// 우편번호
     private String baseAddress;// 주소
     private String DetailedAddress;// 상세주소소

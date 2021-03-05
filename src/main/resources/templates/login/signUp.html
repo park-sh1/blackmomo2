@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>회원가입</title>
+    <style>
+        .id,.nickname{
+            color: red;
+            margin: 0;
+        }
+    </style>
 </head>
 <body>
 <header th:insert="layout/header.html"></header>
@@ -27,6 +33,7 @@
                                 <input type="text" id="id" name="id" maxlength="50" onkeydown="inputIdChk()">
                                 <input type="button" value="중복확인" onclick="openIdChk()">
                                 <input type="hidden" name="idDuplication" value="idUncheck">
+                                <p class="id">*한글 및 특수문자는 아이디로 사용하실수 없습니다.</p>
 
                                 <!--<input type="text" id="id" placeholder="아이디를 입력해 주세요."><button type="button" id="doubleCheck" value="중복확인" style="margin: 0px 10px;">중복확인</button>-->
                             </td>
@@ -35,6 +42,7 @@
                         <tr>
                             <th>*패스워드</th>
                             <td><input placeholder="패스워드를 입력하세요." id="pass" name="pass">
+                                <p>숫자와 문자 포함형태의 10자리이상을 입력해 주세요</p>
                                 <!--<span th:if=""></span>-->
                             </td>
                         </tr>
@@ -52,11 +60,11 @@
                         </tr>
                         <!-- 닉네임 -->
                         <tr>
-                            <th><abbr title="아이디 대신 사용하실 닉네임입니다. <br> 닉네임을 입력하지 않으시면 아이디가 노출이 됩니다.">닉네임</abbr></th>
+                            <th><abbr th:title="@{'아이디 대신 사용하실 닉네임입니다.' + <br> + '닉네임을 입력하지 않으시면 아이디가 노출이 됩니다.'}">닉네임</abbr></th>
                             <td>
                                 <input>
-                                <p>* 아이디 대신 사용하실 닉네임입니다.</p>
-                                <p>* 닉네임을 입력하지 않으시면 아이디가 노출이 됩니다.</p>
+                                <p class="nickname">* 아이디 대신 사용하실 닉네임입니다.</p>
+                                <p class="nickname">* 닉네임을 입력하지 않으시면 아이디가 노출이 됩니다.</p>
                             </td>
                         </tr>
                         <!-- 우편번호 -->
@@ -253,6 +261,8 @@
     function checkValue(){
         var form = document.userInfo;
 
+        var regex = /^.*(?=^.{8,15}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&+=]).*$/;
+
         if(!form.id.value){
             alert("아이디를 입력하세요.");
             // 아이디 입력칸으로 포커스 작성 예정
@@ -266,6 +276,11 @@
         if(!form.pass.value){
             alert("비밀번호를 입력하세요.");
             form.pass.focus();
+            return false;
+        }
+        if(!regex.test($("input[id='pass']").val())){
+
+            alert("비밀번호형식에 문제가 있습니다. 확인 부탁드립니다.")
             return false;
         }
         if(form.passCheck.value != form.pass.value){
@@ -290,14 +305,30 @@
             alert("년도는 숫자만 입력가능합니다.");
             return false;
         }
-
+        if(!form.birthMm.value){
+            alert("월을 입력하세요.");
+            return false;
+        }
+        if(isNaN(form.birthMm.value)){
+            alert("월은 숫자만 입력가능합니다.")
+        }
+        if(!form.birthDd.value){
+            alert("일을 입력하세요.");
+            return false;
+        }
+        if(isNaN(form.birthDd.value)){
+            alert("일은 숫자만 입력가능합니다.")
+        }
     }
 
     // 아이디 중복체크 화면 open
     function openIdChk(){
-
+        /*var id = document.getElementById("id").value;
+        alert("확인 :::" + id);*/
         window.name = "parentForm";
-        window.open("member/IdCheckForm.html", "chkForm", "width=500, height=300, resizable = no, scrolbars = no");
+        /*window.open("/login/idCheckForm", form.id.value, "width=500, height=300, resizable = no, scrolbars = no");*/
+        /*window.open("/login/idCheckForm/" + id, "chkForm", "width=500, height=300, resizable = no, scrolbars = no");*/
+        window.open("/login/idCheckForm", "chkForm", "width=500, height=300, resizable = no, scrolbars = no");
     }
 
     // 아이디 입력창에 값 입력시 hidden에 idUncheck를 세팅한다.
