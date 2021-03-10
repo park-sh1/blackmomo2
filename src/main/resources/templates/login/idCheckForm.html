@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
    <!-- <meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">-->
     <meta charset="UTF-8">
@@ -23,6 +23,8 @@
     </style>
 </head>
 <body onload="pValue()">
+<script src="/vendor/jquery/jquery.min.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <div id="wrap">
     <br>
     <b><font size="4" color="gray">아이디 중복체크</font></b>
@@ -30,16 +32,15 @@
     <br>
     <div id="chk">
         <form id="checkForm">
-            <input type="text" name="idinput" id="id">
-            <input type="button" value="중복확인" onclick="idCheck()">
+            <input type="text" name="idinput" id="userId">
+            <input type="button" value="중복확인" onclick="idCheck();">
         </form>
         <div id="msg"></div>
         <br>
-        <input id="cancelBtn" type="button" value="취소" onclick="window.close()"><br>
+        <input id="cancelBtn" type="button" value="취소" onclick="window.close()">
         <input id="useBtn" type="button" value="사용하기" onclick="sendCheckValue()">
     </div>
 </div>
-</body>
 <script type="text/javascript">
 
     var httpRequest = null;
@@ -77,63 +78,78 @@
 
     // 회원가입창의 아이디 입력란의 값을 가져온다.
     function pValue(){
-        document.getElementById("id").value = opener.document.getElementById("id").value;
+        document.getElementById("userId").value = opener.document.getElementById("userId").value;
     }
 
     // 아이디 중복 체크
     function idCheck(){
-        var id = document.getElementById("id").value;
+        var userId = document.getElementById("userId").value;
 
-        if (!id) {
+        if (!userId) {
             alert("아이디를 입력하지 않았습니다.");
             return false;
         }
-        else if((id < "0" || id > "9") && (id < "A" || id > "Z") && (id < "a" || id > "z")){
+        else if((userId < "0" || userId > "9") && (userId < "A" || userId > "Z") && (userId < "a" || userId > "z")){
             alert("한글 및 특수문자는 아이디로 사용하실수 없습니다.");
+            document.getElementById("useBtn").style.visibility='hidden';
+            document.getElementById("msg").innerHTML = "사용할수없는 아이디입니다.";
             return false;
         }
         else {
-            var param = "id=" + id;
+            /*var param = "id=" + id;
             alert("param ::: " + param);
             httpRequest = getXMLHttpRequest();
             httpRequest.onreadystatechange = callback();
             httpRequest.open("POST", "/login/MemberIdCheckAction", true);
             httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            httpRequest.send(param);
+            httpRequest.send(param);*/
+
+            /*alert("도착 ::: " + userId)*/
+
+            $.ajax({
+                url: "/login/idCheck",
+                type : "post",
+                dataType : "json",
+                data : {"userId" : userId},
+                success : function(data){
+                    /*alert("중복체크 성공");*/
+                    callback(data);
+                }
+                ,error(){
+                    /*alert("중복체크 에러");*/
+                }
+            })
         }
     }
 
     //
-    function callback(){
-        if(httpRequest.readyState == 4){
-            // 결과값을 가져온다.
-            var resultText = httpRequest.responseText;
-            if(resultText == 0){
-                alert("사용할수없는 아이디입니다.");
-                document.getElementById("cancelBtn").style.visibility='visible';
-                document.getElementById("useBtn").style.visibility='hidden';
-                document.getElementById("msg").innerHTML = "";
-            }
-            else if(resultText == 1){
-                document.getElementById("cancelBtn").style.visibility='hidden';
-                document.getElementById("useBtn").style.visibility='visible';
-                document.getElementById("msg").innerHTML = "사용 가능한 아이디입니다.";
-            }
+    function callback(data){
+        if(data == 1){
+            document.getElementById("cancelBtn").style.visibility='visible';
+            document.getElementById("useBtn").style.visibility='hidden';
+            document.getElementById("msg").innerHTML = "사용할수없는 아이디입니다.";
+        }
+        else if(data == 0){
+            /*document.getElementById("cancelBtn").style.visibility='hidden';*/
+            document.getElementById("useBtn").style.visibility='visible';
+            document.getElementById("msg").innerHTML = "사용 가능한 아이디입니다.";
         }
     }
     // 사용하기 클릭시 부모창으로 값 전달
     function sendCheckValue(){
+
         // 중복체크 결과인 idCheck 값을 전달한다.
-        opener.document.userInfo.idDuplication.value = "idCheck";
+        opener.document.getElementById("idDuplication").value = document.getElementById("userId").value;
         // 회원가입 화면의 ID입력란에 값을 전달
-        opener.document.userInfo.id.value = document.getElementById("id").value;
+        opener.document.getElementById("userId").value = document.getElementById("userId").value;
 
         if(opener != null){
             opener.chkForm = null;
-            /*self.close();*/
-            window.open(",'_self',");
-            window.close();
+            self.close();
+            /*window.open(",'_self',");
+            window.close();*/
         }
     }
 </script>
+</body>
 </html>

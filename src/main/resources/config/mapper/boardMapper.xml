@@ -235,7 +235,7 @@
 
     <!-- 댓글 수 -->
     <select id="count" resultType="int">
-        select COUNT(*) from reply where bno = #{bno}
+        select COUNT(*) from reply where bno = #{bno} and delete_yn = 'Y'
     </select>
 
     <!-- 댓글 조회 -->
