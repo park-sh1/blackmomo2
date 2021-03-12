@@ -4,30 +4,32 @@
 
     <!-- 회원 -->
     <resultMap type="com.example.blackmomo.domain.Member" id="memberResultMap">
-        <id     column="user_no"          property="userId"/>
-        <result column="user_id"          property="userId"/>
-        <result column="pass"             property="pass"/>
-        <result column="pass_check"       property="passCheck"/>
-        <result column="name"             property="name"/>
-        <result column="nickname"         property="nickname"/>
-        <result column="email"            property="email"/>
-        <result column="zip_code"         property="zipCode"/>
-        <result column="base_address"     property="baseAddress"/>
-        <result column="detailed_address" property="detailedAddress"/>
-        <result column="phone_number"     property="phoneNumber"/>
-        <result column="gender"           property="gender"/>
-        <result column="date_of_birth"    property="dateOfBirth"/>
-        <result column="interest1"        property="interest1"/>
-        <result column="interest2"        property="interest2"/>
-        <result column="interest3"        property="interest3"/>
-        <result column="registered_date"  property="registeredDete"/>
-        <result column="modified_date"    property="modifiedDate"/>
-        <result column="secession_date"   property="secessionDate"/>
-        <result column="last_login_date"  property="lastLoginDate"/>
-        <result column="mb_level"         property="mbLevel"/>
-        <result column="certification_yn" property="certificationYn"/>
-        <result column="use_yn"           property="useYn"/>
-        <result column="delete_yn"        property="deleteYn"/>
+        <id     column="user_no"           property="userNo"/>
+        <result column="user_id"           property="userId"/>
+        <result column="pass"              property="pass"/>
+        <result column="pass_check"        property="passCheck"/>
+        <result column="name"              property="name"/>
+        <result column="nickname"          property="nickname"/>
+        <result column="email"             property="email"/>
+        <result column="zip_code"          property="zipCode"/>
+        <result column="base_address"      property="baseAddress"/>
+        <result column="detailed_address"  property="detailedAddress"/>
+        <result column="phone_number"      property="phoneNumber"/>
+        <result column="gender"            property="gender"/>
+        <result column="date_of_birth"     property="dateOfBirth"/>
+        <result column="interest1"         property="interest1"/>
+        <result column="interest2"         property="interest2"/>
+        <result column="interest3"         property="interest3"/>
+        <result column="registered_date"   property="registeredDete"/>
+        <result column="modified_date"     property="modifiedDate"/>
+        <result column="secession_date"    property="secessionDate"/>
+        <result column="last_login_date"   property="lastLoginDate"/>
+        <result column="mb_level"          property="mbLevel"/>
+        <result column="email_allowing_yn" property="emailAllowingYn"/>
+        <result column="certification_yn"  property="certificationYn"/>
+        <result column="use_yn"            property="useYn"/>
+        <result column="delete_yn"         property="deleteYn"/>
+        <result column="manager_yn"         property="managerYn"/>
     </resultMap>
 
     <!-- 회원정보 컬럼 -->
@@ -53,9 +55,11 @@
         ,secession_date
         ,last_login_date
         ,mb_level
+        ,email_allowing_yn
         ,certification_yn
         ,use_yn
         ,delete_yn
+        ,manager_yn
     </sql>
 
     <!-- 아이디 중복체크 -->
@@ -64,12 +68,12 @@
     </select>
 
     <!-- 전화번호 등록체크 -->
-    <select id="phoneCheck">
-        select COUNT(phone_number) from member where phone_number = #{phone_number}
+    <select id="phoneCheck" resultType="int">
+        select COUNT(phone_number) from member where phone_number = #{phoneNumber}
     </select>
 
     <!-- 회원가입 -->
-    <insert id="insert">
+    <insert id="userInsert">
         insert into member (<include refid="column" />)
         value
             ((select IFNULL(max(user_no)+'1','1') from member b)
@@ -93,8 +97,10 @@
             ,''
             ,sysdate()
             ,#{mbLevel}
+            ,#{emailAllowingYn}
             ,#{certificationYn}
             ,'Y'
+            ,'N'
             ,'N'
             )
     </insert>
@@ -119,6 +125,7 @@
         ,''
         ,sysdate()
         ,#{mbLevel}
+        ,#{emailAllowingYn}
         ,#{certificationYn}
         ,'Y'
         ,'N'

@@ -18,4 +18,17 @@ public class LoginServiceImpl implements LoginService {
 
         return loginMapper.idCheck(member);
     }
+
+    @Override
+    public int phoneCheck(Member member) throws Exception {
+
+        System.out.println("serviceImpl 도착 ::: " + member);
+
+        return loginMapper.phoneCheck(member);
+    }
+
+    @Override
+    public void userInsert(Member member) throws Exception {
+      loginMapper.userInsert(member);
+    }
 }

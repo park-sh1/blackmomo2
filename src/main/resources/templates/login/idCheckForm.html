@@ -84,12 +84,14 @@
     // 아이디 중복 체크
     function idCheck(){
         var userId = document.getElementById("userId").value;
-
+        // ID조건 : 영문과 숫자만 입력가능하다, 6자리에서 20 자리까지 입력 가능
+        var userType = /^[a-z]+[a-z0-9]{5,19}$/g;
         if (!userId) {
             alert("아이디를 입력하지 않았습니다.");
             return false;
         }
-        else if((userId < "0" || userId > "9") && (userId < "A" || userId > "Z") && (userId < "a" || userId > "z")){
+        /*else if((userId < "0" || userId > "9") && (userId < "A" || userId > "Z") && (userId < "a" || userId > "z")){*/
+        else if(!userType.test($("input[id='userId']").val())){
             alert("한글 및 특수문자는 아이디로 사용하실수 없습니다.");
             document.getElementById("useBtn").style.visibility='hidden';
             document.getElementById("msg").innerHTML = "사용할수없는 아이디입니다.";

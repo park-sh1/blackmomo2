@@ -10,4 +10,16 @@ public interface LoginService {
 
     // 아이디 중복체크
     public int idCheck(Member member) throws Exception;
+
+    // 휴대폰 번호 중복체크
+    int phoneCheck(Member member) throws Exception;
+
+    // 회원가입 처리
+    void userInsert(Member member) throws Exception;
+
+    // 회원 정보 수정
+
+    // 회원 탈퇴
+
+    //
 }

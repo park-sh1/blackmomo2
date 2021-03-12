@@ -17,13 +17,73 @@
             text-align: center;
         }
     </style>
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script src='./js/script.js'></script>
+    <script>
+        function sample6_execDaumPostcode() {
+            new daum.Postcode({
+                oncomplete: function (data) {
+                    // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분
+
+                    // 각 주소의 노출 규칙에 따라 주소를 조합한다
+                    // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다
+                    var addr = ''; // 주소 변수
+                    var extraAddr = ''; // 참고항목 변수
+
+                    //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+                    if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
+                        addr = data.roadAddress;
+                    } else { // 사용자가 지번 주소를 선택했을 경우(J)
+                        addr = data.jibunAddress;
+                    }
+
+                    // 사용자가 선택한 주소가 도로명 타입일때 참고항목을 조합한다.
+                    if (data.userSelectedType === 'R') {
+                        // 법정동명이 있을 경우 추가한다. (법정리는 제외)
+                        // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
+                        if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+
+                            extraAddr += data.bname;
+
+                        }
+                        // 건물명이 있고, 공동주택일 경우 추가한다.
+                        if (data.buildingName !== '' && data.apartment === 'Y') {
+                            extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+
+                        }
+                        // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+                        if (extraAddr !== '') {
+                            extraAddr = '(' + extraAddr + ')'; // 참고항목 : 동을 표시 ex : 임수동, 제기동
+                        }
+                        // 조합된 참고항목을 해당 필드에 넣는다.
+                        document.getElementById("extraAddress").value = extraAddr;
+                        document.getElementById('zipCode').value = data.zonecode;
+                        document.getElementById("baseAddress").value = addr;
+                        document.getElementById("detailedAddress").focus();
+
+                    } else {
+                        document.getElementById("extraAddress").value = '';
+                        document.getElementById('zipCode').value = data.zonecode;
+                        document.getElementById("baseAddress").value = addr;
+                        document.getElementById("detailedAddress").focus();
+                    }
+
+                    // 우편번호와 주소 정보를 해당 필드에 넣는다.
+                    /*document.getElementById('sample6_postcode').value = data.zonecode;
+                    document.getElementById("sample6_address").value = addr;
+                    // 커서를 상세주소 필드로 이동한다.
+                    document.getElementById("sample6_detailAddress").focus();*/
+                }
+            }).open();
+        }
+    </script>
 </head>
 <body>
 <header th:insert="layout/header.html"></header>
 <div>
     <div style="width:80%; margin: 10px  auto;">
         <div style="width:800px;">
-            <form action="/login/signUp" method="post">
+            <form action="/login/signUp" method="post" name="userInfo">
                 <h1>필수 정보</h1>
                 <table style="width: 100%;">
                     <colgroup>
@@ -31,19 +91,13 @@
                         <col width="*">
                     </colgroup>
                     <tbody id="necessary">
-                        <!--<tr>
-                            <th colspan="2"><h1>필수 정보</h1></th>
-                        </tr>-->
-                        <!-- 회원 id -->
                         <tr>
                             <th>*아이디</th>
                             <td>
-                                <input type="text" id="userId" name="userId" maxlength="50" onkeydown="inputIdChk()">
+                                <input type="text" id="userId" name="userId" maxlength="20" onkeydown="inputIdChk()">
                                 <input type="button" value="중복확인" onclick="openIdChk()">
                                 <input type="hidden" id="idDuplication" name="idDuplication" value="idUncheck">
                                 <p class="id">*한글 및 특수문자는 아이디로 사용하실수 없습니다.</p>
-
-                                <!--<input type="text" id="id" placeholder="아이디를 입력해 주세요."><button type="button" id="doubleCheck" value="중복확인" style="margin: 0px 10px;">중복확인</button>-->
                             </td>
                         </tr>
                         <!-- 패스워드 -->
@@ -79,14 +133,49 @@
                                 <p class="nickname">* 닉네임을 입력하지 않으시면 아이디가 노출이 됩니다.</p>
                             </td>
                         </tr>
-                        <!-- 우편번호 -->
                         <tr>
+                           <th>
+                               우편번호
+                           </th>
+                            <td>
+                                <p>
+                                    <label>
+                                        <input type="text" size="5" maxlength="5" name="zipCode" id="zipCode" placeholder="우편번호">
+                                        <input type="button" value="우편번호 검색" onclick="sample6_execDaumPostcode()">
+                                    </label>
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                주소
+                            </th>
+                            <td>
+                                <input type="text" id="baseAddress" name="baseAddress" placeholder="주소">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                상세주소
+                            </th>
+                            <td>
+                                <input type="text" id="detailedAddress" name="detailedAddress" placeholder="상세주소">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>참고사항</th>
+                            <td>
+                                <input type="text" name="address3" id="extraAddress" placeholder="참고항목">
+                            </td>
+                        </tr>
+                        <!-- 우편번호 -->
+                        <!--<tr>
                             <th>*우편번호</th>
                             <td>
                                 <input type="text" id="zipCode" maxlength="5">
                             </td>
                         </tr>
-                        <!-- 기본 주소 -->
+                        &lt;!&ndash; 기본 주소 &ndash;&gt;
                         <tr>
                             <th>*기본 주소</th>
                             <td>
@@ -94,17 +183,18 @@
                                 <input type="button" onclick="zipCheck()" value="주소검색">
                             </td>
                         </tr>
-                        <!-- 상세 주소 -->
+                        &lt;!&ndash; 상세 주소 &ndash;&gt;
                         <tr>
                             <th>*상세 주소</th>
                             <td>
                                 <input type="text" id="DetailedAddress" name="DetailedAddress">
                             </td>
-                        </tr>
+                        </tr>-->
                         <!-- 휴대폰번호 -->
                         <tr>
                             <th>*휴대폰번호</th>
                             <td>
+                                <input type="hidden" id="phoneNumber" name="phoneNumber">
                                 <select id="pNumber1" class="pNumber">
                                     <option>010</option>
                                     <option>011</option>
@@ -118,25 +208,49 @@
                                 -
                                 <input type="text" maxlength="4" id="pNumber3" class="pNumber">
                                 <input type="button" value="휴대폰체크" onclick="phoneChk()">
+                                <input type="hidden" id="phoneDuplication" name="phoneDuplication" value="phone">
                             </td>
                         </tr>
                         <!-- 성별 -->
                         <tr>
                             <th>*성별</th>
-                            <td><span>남성</span><input type="radio"> | <span>여성</span><input type="radio"></td>
+                            <td><span>남성</span><input type="radio" name="gender" value="M" style="margin: 0 10px;">  <span>여성</span><input type="radio" name="gender" value="W" style="margin: 0 10px;"></td>
                         </tr>
                         <!-- 생년월일 -->
                         <tr>
                             <th>*생년월일</th>
                             <td>
+                                <input type="hidden" id="dateOfBirth" name="dateOfBirth">
                                 <input id="birthYy" class="birth" maxlength="4"><span>년</span>
                                 <input id="birthMm" class="birth" maxlength="2"><span>월</span>
                                 <input id="birthDd" class="birth" maxlength="2"><span>일</span>
                             </td>
                         </tr>
                         <tr>
+                            <th>*이메일</th>
+                            <td>
+                                <input type="email" id="nameEmail" name="nameEmail">
+                                <samp><b>@</b></samp>
+                                <select id="emailAllowingYn" onchange="mailSum()">
+                                    <option value="">이메일 선택</option>
+                                    <option value="hanmail.net">hanmail.net</option>
+                                    <option value="naver.com">naver.com</option>
+                                    <option value="gmail.com">gmail.com</option>
+                                    <option value="nate.com">nate.com</option>
+                                    <option value="hotmail.com">hotmail.com</option>
+                                    <option value="paran.com">paran.com</option>
+                                    <option value="empal.com">empal.com</option>
+                                    <option value="korea.com">korea.com</option>
+                                    <option value="freechal.com">freechal.com</option>
+                                    <option value="etc">직접 등록</option>
+                                </select>
+                                <input type="text" id="emailType" style="visibility: hidden;">
+                                <input type="hidden" id="email">
+                            </td>
+                        </tr>
+                        <tr>
                             <th>이메일 수신여부</th>
-                            <td><input type="radio">동의</input><input type="radio">거부</input></td>
+                            <td><input type="radio" name="emailAllowingYn" value="Y">동의</input><input type="radio" name="emailAllowingYn" value="N">거부</input></td>
                         </tr>
                     </tbody>
                 </table>
@@ -152,7 +266,7 @@
                         <tr>
                             <th>관심분야1</th>
                             <td>
-                                <select>
+                                <select id="interest1" name="interest1">
                                     <option>-- 관심분야 --</option>
                                     <option>공포</option>
                                     <option>심리</option>
@@ -168,12 +282,13 @@
                                     <option>드라마</option>
                                     <option>기타</option>
                                 </select>
+                                <input type="text" style="visibility: hidden">
                             </td>
                         </tr>
                         <tr>
                             <th>관심분야2</th>
                             <td>
-                                <select>
+                                <select id="interest2" name="interest2">
                                     <option>-- 관심분야 --</option>
                                     <option>공포</option>
                                     <option>심리</option>
@@ -194,7 +309,7 @@
                         <tr>
                             <th>관심분야3</th>
                             <td>
-                                <select>
+                                <select id="interest3" name="interest3">
                                     <option>-- 관심분야 --</option>
                                     <option>공포</option>
                                     <option>심리</option>
@@ -225,7 +340,7 @@
                             <th>개인정보 수집 <br>및 이용동의</th>
                             <td>
                                 <textarea th:insert="/login/terms2.html" style="width:100%; height: 200px;"></textarea>
-                                <input type="checkbox"><span>동의</span>
+                                <input type="checkbox" id="perIAgreementYn" name="perIAgreementYn"><span>동의</span>
                             </td>
                         </tr>
                     </tbody>
@@ -367,6 +482,7 @@
 
     // 회원가입 화면의 입력값들을 검사(id,pw, pw 일치여부, 이름 )
     function checkValue(){
+        alert("등록하기~")
         var form = document.userInfo;
 
         var regex = /^.*(?=^.{8,15}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&+=]).*$/;
@@ -377,7 +493,7 @@
             form.userId.focus();
             return false;
         }
-        if(form.idDuplication.value != "idCheck"){
+        if(form.idDuplication.value != form.userId.value){
             alert("아이디 중복체크를 해주세요.");
             return false;
         }
@@ -398,29 +514,53 @@
         }
         if(!form.name.value){
             alert("이름을 입력하세요.");
+            form.name.focus();
             return false;
         }
-        if(!form.birthyy.value){
+        if(!form.birthYy.value){
             alert("년도를 입력하세요.");
+            form.birthYy.focus();
             return false;
         }
-        if(isNaN(form.birthyy.value)){
+        if(isNaN(form.birthYy.value)){
             alert("년도는 숫자만 입력가능합니다.");
+            form.birthYy.focus();
             return false;
         }
         if(!form.birthMm.value){
             alert("월을 입력하세요.");
+            form.birthMm.focus();
             return false;
         }
         if(isNaN(form.birthMm.value)){
-            alert("월은 숫자만 입력가능합니다.")
+            alert("월은 숫자만 입력가능합니다.");
+            form.birthMm.focus();
+            return false;
         }
         if(!form.birthDd.value){
             alert("일을 입력하세요.");
+            form.birthDd.focus();
             return false;
         }
         if(isNaN(form.birthDd.value)){
             alert("일은 숫자만 입력가능합니다.")
+            form.birthDd.focus();
+            return false;
+        }
+        if(!form.gender.value){
+            alert("성별을 골라주세요");
+            return false;
+        }
+        if(form.phoneDuplication.value != form.phoneNumber.value){
+            alert("휴대폰 중복체크를 해주세요");
+            document.getElementById("phoneDuplication").focus();
+            return false;
+        }
+        document.getElementById("dateOfBirth").value = document.getElementById("birthYy").value
+                                                     + document.getElementById("birthMm").value
+                                                     + document.getElementById("birthDd").value;
+        if (confirm("회원가입하시겠습니까?")){
+            form.submit();
         }
     }
 
@@ -441,8 +581,45 @@
     }
 
     function phoneChk(){
-        var phone =
+
+        var phone = document.getElementById("pNumber1").value
+                  + document.getElementById("pNumber2").value
+                  + document.getElementById("pNumber3").value;
+        $.ajax({
+            type : 'post'
+            , url : '/login/phoneCheck'
+            , dataType : "json"
+            , data : {"phoneNumber" : phone}
+            , success : function(data){
+                if(data == '1'){
+                    alert("해당 전화번호는 이미 등록이 된 번호입니다.\n 확인 후, 다시 등록하시기 바랍니다.");
+                }
+                else if(data == '0'){
+                    alert("해당 전화번호는 등록이 가능합니다.")
+                    document.getElementById("phoneNumber").value = phone;
+                    document.getElementById("phoneDuplication").value = phone;
+                }
+            }
+            , error(){
+                alert("휴대폰체크 중 오류 발생!!!")
+            }
+        })
     }
+    /*$("emailAddrSelect").change(function (){
+        var year
+    })    */
+    function mailSum(){
+        var emailType = document.getElementById("emailAllowingYn").value;
+
+        if(emailType == 'etc'){
+            document.getElementById("emailType").style.visibility='visible';
+        }
+        else if(emailType != 'etc'){
+            document.getElementById("emailType").style.visibility='hidden';
+            document.getElementById("email").value = document.getElementById("nameEmail").value + '@' + emailType;
+        }
+    }
+
 </script>
 </body>
 </html>
