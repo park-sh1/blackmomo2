@@ -17,6 +17,8 @@ public interface LoginService {
     // 회원가입 처리
     void userInsert(Member member) throws Exception;
 
+    Member login(Member member) throws Exception;
+
     // 회원 정보 수정
 
     // 회원 탈퇴

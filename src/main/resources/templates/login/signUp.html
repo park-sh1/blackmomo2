@@ -245,7 +245,7 @@
                                     <option value="etc">직접 등록</option>
                                 </select>
                                 <input type="text" id="emailType" style="visibility: hidden;">
-                                <input type="hidden" id="email">
+                                <input type="hidden" id="email" neme="email">
                             </td>
                         </tr>
                         <tr>
@@ -482,9 +482,8 @@
 
     // 회원가입 화면의 입력값들을 검사(id,pw, pw 일치여부, 이름 )
     function checkValue(){
-        alert("등록하기~")
-        var form = document.userInfo;
 
+        var form = document.userInfo;
         var regex = /^.*(?=^.{8,15}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&+=]).*$/;
 
         if(!form.userId.value){

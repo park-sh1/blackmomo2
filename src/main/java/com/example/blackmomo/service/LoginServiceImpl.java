@@ -29,6 +29,16 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public void userInsert(Member member) throws Exception {
+        System.out.println("데이터 확인 ::: " + member.getPassCheck());
       loginMapper.userInsert(member);
+    }
+
+    @Override
+    public Member login(Member member) throws Exception{
+
+        System.out.println("로그인 id ::: " + member.getUserId() + "로그인 비번 ::: " + member.getPass());
+        loginMapper.login(member);
+
+        return null;
     }
 }

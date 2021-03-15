@@ -2,13 +2,16 @@ package com.example.blackmomo.controller;
 
 import com.example.blackmomo.domain.Member;
 import com.example.blackmomo.service.LoginService;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping(value = "/login")
@@ -58,12 +61,16 @@ public class LoginController {
         System.out.println("회원정보 ::: " + member.getDateOfBirth());
         System.out.println("회원정보 ::: " + member.getEmail());
         System.out.println("회원정보 ::: " + member.getEmailAllowingYn());
-        System.out.println("개인정보동의 ::: " + member.getPerIAgreementYn());
+        System.out.println("개인정보동의 ::: " + member.getPerlAgreementYn());
 
         System.out.println("회원정보 ::: " + member.getInterest1());
         System.out.println("회원정보 ::: " + member.getInterest2());
         System.out.println("회원정보 ::: " + member.getInterest3());
 
+
+        if (member.getCertificationYn() == null) {
+            member.setCertificationYn("N");
+        }
 
         try{
             loginService.userInsert(member);
@@ -71,9 +78,31 @@ public class LoginController {
             e.printStackTrace();
         }
 
-        return "redirect:/";
+        return "redirect:/login/";
         /*return "/login.html";*/
     }
+
+    //로그인 처리
+    @RequestMapping(value="/loginForm", method = RequestMethod.POST)
+    public String loginForm(Member member, HttpServletRequest request, RedirectAttributes rttr) throws Exception{
+
+        /*Logger.info("post login");*/
+
+        HttpSession session = request.getSession();
+        Member login = loginService.login(member);
+
+        if(login == null){
+            session.setAttribute("member", null);
+            rttr.addFlashAttribute("msg", false);
+        } else {
+            session.setAttribute("member", login);
+        }
+
+        return "redirect:/";
+    }
+
+    // 로그아웃 처리
+
 
 
     @PostMapping("/doubleCheck")

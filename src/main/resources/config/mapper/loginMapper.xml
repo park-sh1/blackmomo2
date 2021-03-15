@@ -26,10 +26,11 @@
         <result column="last_login_date"   property="lastLoginDate"/>
         <result column="mb_level"          property="mbLevel"/>
         <result column="email_allowing_yn" property="emailAllowingYn"/>
+        <result column="perl_agreement_yn" property="perlAgreementYn"/>
+        <result column="manager_yn"         property="managerYn"/>
         <result column="certification_yn"  property="certificationYn"/>
         <result column="use_yn"            property="useYn"/>
         <result column="delete_yn"         property="deleteYn"/>
-        <result column="manager_yn"         property="managerYn"/>
     </resultMap>
 
     <!-- 회원정보 컬럼 -->
@@ -52,14 +53,14 @@
         ,interest3
         ,registered_date
         ,modified_date
-        ,secession_date
         ,last_login_date
         ,mb_level
         ,email_allowing_yn
+        ,perl_agreement_yn
+        ,manager_yn
         ,certification_yn
         ,use_yn
         ,delete_yn
-        ,manager_yn
     </sql>
 
     <!-- 아이디 중복체크 -->
@@ -79,7 +80,7 @@
             ((select IFNULL(max(user_no)+'1','1') from member b)
             ,#{userId}
             ,#{pass}
-            ,#{pass_check}
+            ,#{passCheck}
             ,#{name}
             ,#{nickname}
             ,#{email}
@@ -94,13 +95,13 @@
             ,#{interest3}
             ,sysdate()
             ,sysdate()
-            ,''
             ,sysdate()
-            ,#{mbLevel}
+            ,'B'
             ,#{emailAllowingYn}
+            ,#{perlAgreementYn}
+            ,'N'
             ,#{certificationYn}
             ,'Y'
-            ,'N'
             ,'N'
             )
     </insert>
@@ -133,5 +134,10 @@
     </insert>
     <!-- 회원삭제 -->
 
-    <!--  -->
+    <!-- 로그인 처리 -->
+    <select id="login" resultMap="memberResultMap">
+        select user_id, pass
+        from member
+        where user_id = #{userId} and pass = #{pass}
+    </select>
 </mapper>
