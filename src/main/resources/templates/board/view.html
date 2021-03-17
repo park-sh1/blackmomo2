@@ -147,10 +147,8 @@
         } else if(secretReply){
             secretReply = 'Y';
         }
-        alert("확인 ::: " + secretReply);
 
         var param={"replyText" : replyText, "bno" : bno, "secretReply" : secretReply};
-        alert("param ::: " + param);
         $.ajax({
             type:"post"
             , url: "/board/reply/insert"

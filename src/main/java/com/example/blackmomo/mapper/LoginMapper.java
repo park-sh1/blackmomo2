@@ -16,5 +16,5 @@ public interface LoginMapper {
     public void userInsert(Member member) throws Exception;
 
     // 로그인처리
-    void login(Member member) throws Exception;
+    Member login(Member member) throws Exception;
 }

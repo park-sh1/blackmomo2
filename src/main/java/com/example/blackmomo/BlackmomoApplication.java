@@ -11,5 +11,4 @@ public class BlackmomoApplication {
     public static void main(String[] args) {
         SpringApplication.run(BlackmomoApplication.class, args);
     }
-
 }

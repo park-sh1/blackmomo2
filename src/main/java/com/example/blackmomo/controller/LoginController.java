@@ -50,24 +50,6 @@ public class LoginController {
     @PostMapping("/signUp")
     public String signform(Member member) throws Exception{
 
-        System.out.println("회원정보 ::: " + member.getUserId());
-        System.out.println("회원정보 ::: " + member.getPass());
-        System.out.println("회원정보 ::: " + member.getName());
-        System.out.println("회원정보 ::: " + member.getZipCode());
-        System.out.println("회원정보 ::: " + member.getBaseAddress());
-        System.out.println("회원정보 ::: " + member.getDetailedAddress());
-        System.out.println("회원정보 ::: " + member.getPhoneNumber());
-        System.out.println("회원정보 ::: " + member.getGender());
-        System.out.println("회원정보 ::: " + member.getDateOfBirth());
-        System.out.println("회원정보 ::: " + member.getEmail());
-        System.out.println("회원정보 ::: " + member.getEmailAllowingYn());
-        System.out.println("개인정보동의 ::: " + member.getPerlAgreementYn());
-
-        System.out.println("회원정보 ::: " + member.getInterest1());
-        System.out.println("회원정보 ::: " + member.getInterest2());
-        System.out.println("회원정보 ::: " + member.getInterest3());
-
-
         if (member.getCertificationYn() == null) {
             member.setCertificationYn("N");
         }
@@ -88,21 +70,33 @@ public class LoginController {
 
         /*Logger.info("post login");*/
 
+
+
         HttpSession session = request.getSession();
         Member login = loginService.login(member);
 
+        String re = null;
+        
         if(login == null){
             session.setAttribute("member", null);
             rttr.addFlashAttribute("msg", false);
-        } else {
+            re = "redirect:/login/";
+        } else if (login != null){
+            System.out.println("정보 확인 ::: " + member.getUserId());
             session.setAttribute("member", login);
+            rttr.addFlashAttribute("msg", "로그인 성공");
+            re = "redirect:/";
         }
-
-        return "redirect:/";
+        return re;
     }
 
     // 로그아웃 처리
+    @RequestMapping(value = "/logout", method = RequestMethod.GET)
+    public String logout(HttpSession session) throws Exception {
 
+        session.invalidate();
+        return "redirect:/login/";
+    }
 
 
     @PostMapping("/doubleCheck")

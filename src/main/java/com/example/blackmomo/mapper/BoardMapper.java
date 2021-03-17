@@ -13,7 +13,7 @@ import java.util.List;
 public interface BoardMapper {
     // 조회
     @Autowired
-    public List<Board> boardList(Paging page, Search sh) throws Exception;
+    public List<Board> boardList(Paging page, Search search) throws Exception;
 
     public List<Board> boardList2() throws Exception;
 
@@ -34,7 +34,7 @@ public interface BoardMapper {
     public boolean delete(int id);
 
     // 조회수 계산
-    public int countBoard(Paging page, Search sh);
+    public int countBoard(Paging page, Search search);
 
     // 이전글 정보
     Board prevSelect(int id);

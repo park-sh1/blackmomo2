@@ -65,22 +65,22 @@
             delete_yn = "N"
             and use_yn = "Y"
             and expose_yn = "Y"
-        <if test="sh.searchType != null">
+        <if test="search.searchType != null">
 
-            <if test="sh.searchType == 't'.toString()">
-                AND title LIKE '%' #{sh.keyword} '%'
+            <if test="search.searchType == 't'.toString()">
+                AND title LIKE '%' #{search.keyword} '%'
             </if>
 
-            <if test="sh.searchType == 'c'.toString()">
-                AND content LIKE '%' #{sh.keyword}'%'
+            <if test="search.searchType == 'c'.toString()">
+                AND content LIKE '%' #{search.keyword}'%'
             </if>
 
-            <if test="sh.searchType == 'w'.toString()">
-                AND modifier LIKE '%' #{sh.keyword} '%'
+            <if test="search.searchType == 'w'.toString()">
+                AND modifier LIKE '%' #{search.keyword} '%'
             </if>
 
-            <if test="sh.searchType == 'all'.toString()">
-                AND (title LIKE '%' #{sh.keyword} '%') or (content LIKE '%' #{sh.keyword} '%') or (modifier LIKE '%' #{sh.keyword} '%')
+            <if test="search.searchType == 'all'.toString()">
+                AND (title LIKE '%' #{search.keyword} '%') or (content LIKE '%' #{search.keyword} '%') or (modifier LIKE '%' #{search.keyword} '%')
             </if>
         </if>
     </sql>
@@ -118,7 +118,7 @@
                     <where>
                         <include refid="search"/>
                     </where>
-                    order by ${sh.orderBy} ${sh.orderType}
+                    order by ${search.orderBy} ${search.orderType}
                 ) bo
             ) bo
         )bo
@@ -133,7 +133,7 @@
                      SELECT *
                      FROM dodo.board bo, (Select @rownum := 0) as R
                      <where><include refid="search"/></where>
-                     order by ${sh.orderBy} ${sh.orderType}
+                     order by ${search.orderBy} ${search.orderType}
                      ) bo
              ) bo
         WHERE RN BETWEEN #{page.start} AND #{page.end}

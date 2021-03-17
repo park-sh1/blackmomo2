@@ -1,6 +1,7 @@
 package com.example.blackmomo.controller;
 
 import com.example.blackmomo.domain.*;
+import com.example.blackmomo.service.BoardService;
 import com.example.blackmomo.service.BoardServiceImpl;
 
 import com.example.blackmomo.service.FileService;
@@ -44,7 +45,8 @@ public class BoardController {
     private static final Logger logger = LoggerFactory.getLogger(BoardController.class);
 
     @Autowired
-    BoardServiceImpl boardServiceImpl;
+    /*BoardServiceImpl boardServiceImpl;*/
+    BoardService boardService;
 
     @Autowired
     FileService fileService;
@@ -116,11 +118,12 @@ public class BoardController {
 
         vo = new Paging(total, Integer.parseInt(nowPage), Integer.parseInt(cntPerPage));
 
-        total = boardServiceImpl.countBoard(vo, search);
+        // 게시글수 조회
+        total = boardService.countBoard(vo, search);
 
         vo = new Paging(total, Integer.parseInt(nowPage), Integer.parseInt(cntPerPage));
 
-        List<Board> boardList = boardServiceImpl.findList(vo, search);
+        List<Board> boardList = boardService.findList(vo, search);
 
         model.addAttribute("paging", vo);
         model.addAttribute("search", search);
@@ -207,7 +210,7 @@ public class BoardController {
             e.printStackTrace();
         }
 
-        boardServiceImpl.findSave(board);
+        boardService.findSave(board);
 
         return "redirect:/board/list";
     }
@@ -221,10 +224,11 @@ public class BoardController {
      */
     @GetMapping("/view/{id}")
     public String view(@PathVariable("id") int id, Model model) throws Exception{
-        System.out.println("상세 부분 도착");
-        boardServiceImpl.boardCount(id);
 
-        Board boardDate = boardServiceImpl.findView(id);
+        // 조회수 갱신
+        boardService.boardCount(id);
+
+        Board boardDate = boardService.findView(id);
 
         FileDto file = null;
 
@@ -233,9 +237,9 @@ public class BoardController {
         }
 
         // 이전글 정보
-        Board boardPrev = boardServiceImpl.prevSelect(id);
+        Board boardPrev = boardService.prevSelect(id);
         // 다음글 정보
-        Board boardNext = boardServiceImpl.nextSelect(id);
+        Board boardNext = boardService.nextSelect(id);
 
         /*System.out.println("이전글 : " + boardPrev.getId());*/
         /*System.out.println("다음글 : " + boardNext.getId());*/
@@ -256,7 +260,7 @@ public class BoardController {
     @GetMapping("/edit/{id}")
     public String boardEdit(@PathVariable("id") int id, Model model, RedirectAttributes rttr) {
 
-        Board board = boardServiceImpl.findSelectEdit(id);
+        Board board = boardService.findSelectEdit(id);
         FileDto fileDto = fileService.findSelectEdit(board.getFileId());
         model.addAttribute("edit", board);
         model.addAttribute("file", fileDto);
@@ -325,7 +329,7 @@ public class BoardController {
             e.printStackTrace();
         }
 
-        boardServiceImpl.updateAll(board);
+        boardService.updateAll(board);
 
         return "redirect:/board/list";
     }
@@ -379,7 +383,7 @@ public class BoardController {
             return "redirect:/board/list";
         }
         try{
-            boolean isDeleted = boardServiceImpl.findDel(id);
+            boolean isDeleted = boardService.findDel(id);
             if (isDeleted == false) {
                 // TODO => 게시글 삭제에 실패하였다는 메시지를 전달
                 System.out.println("게시글 삭제에 실패하였습니다. 재확인하세요");
@@ -454,7 +458,7 @@ public class BoardController {
     @RequestMapping("/reply/list")
     public ModelAndView replyList(int bno, ModelAndView mav) throws Exception {
 
-        Board boardDate = boardServiceImpl.findView(bno);
+        Board boardDate = boardService.findView(bno);
         FileDto file = null;
 
         if(boardDate.getFileId() > 0 ) {
@@ -463,9 +467,9 @@ public class BoardController {
 
         // 댓글내용, 작성자번호, 작성자명, 작성일시, 수정일시
         int replyTotal = 0; // 댓글 수
-        replyTotal = boardServiceImpl.count(bno);
+        replyTotal = boardService.count(bno);
 
-        List<Reply> replyList = boardServiceImpl.list(bno); //댓글 목록
+        List<Reply> replyList = boardService.list(bno); //댓글 목록
         mav.setViewName("/board/reply"); //뷰의 이름
         mav.addObject("replyList", replyList); //뷰에 전달할 데이터 저장
         mav.addObject("replyTotal", replyTotal); //뷰에 전달할 댓글수
@@ -503,7 +507,7 @@ public class BoardController {
         System.out.println("작성자 ::: " + dto.getReplyer());
 
         //댓글이 테이블에 저장됨
-        boardServiceImpl.create(dto);
+        boardService.create(dto);
         System.out.println("확인" + dto);
         //jsp 페이지로 가거나 데이터를 리턴하지 않음
     }
@@ -522,8 +526,6 @@ public class BoardController {
         String userId = "userId";
         dto.setReplyer(userId);
 
-        System.out.println("등록 도착 ::: " + dto);
-
         //댓글 작성자 아이디
         //현재 접속중인 사용자 아이디
         /* String userid=(String)session.getAttribute("userid");*/
@@ -531,7 +533,7 @@ public class BoardController {
         dto.setName(name);
 
         //댓글이 테이블에 저장됨
-        boardServiceImpl.modify(dto);
+        boardService.modify(dto);
     }
 
     @PostMapping("/reply/replyDelete")
@@ -540,6 +542,6 @@ public class BoardController {
         dto.setReplyer(userId);
         System.out.println("삭제 도착 ::: " + dto);
 
-        boardServiceImpl.replyDelete(dto);
+        boardService.replyDelete(dto);
     }
 }
