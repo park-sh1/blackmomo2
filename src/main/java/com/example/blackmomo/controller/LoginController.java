@@ -3,6 +3,7 @@ package com.example.blackmomo.controller;
 import com.example.blackmomo.domain.Member;
 import com.example.blackmomo.service.LoginService;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +18,8 @@ import javax.servlet.http.HttpSession;
 @RequestMapping(value = "/login")
 public class LoginController {
 
+    private static final Logger logger = LoggerFactory.getLogger(BoardController.class);
+
     @Autowired
     LoginService loginService;
 
@@ -28,12 +31,6 @@ public class LoginController {
     public String login(){
         return "/login/login.html";
     }
-
-    /**
-     * <p>로그인 진행</p>
-     */
-    /*@PostMapping("/login")
-    public login()*/
 
     /**
      * <p>회원가입 화면으로</p>
@@ -68,7 +65,7 @@ public class LoginController {
     @RequestMapping(value="/loginForm", method = RequestMethod.POST)
     public String loginForm(Member member, HttpServletRequest request, RedirectAttributes rttr) throws Exception{
 
-        /*Logger.info("post login");*/
+        logger.info("post login");
 
 
 
@@ -84,6 +81,8 @@ public class LoginController {
         } else if (login != null){
             System.out.println("정보 확인 ::: " + member.getUserId());
             session.setAttribute("member", login);
+            session.setAttribute("userId", login.getUserId());
+            session.setAttribute("nickname", login.getNickname());
             rttr.addFlashAttribute("msg", "로그인 성공");
             re = "redirect:/";
         }
@@ -93,6 +92,9 @@ public class LoginController {
     // 로그아웃 처리
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
     public String logout(HttpSession session) throws Exception {
+
+        // 세션의 속성을 삭제하려면 session 객체의 removeAttribute() 메소드를 사용
+        // 세션의 모든 속성을 삭제할 때는 session 객체의 invalidate() 메소드를 사용
 
         session.invalidate();
         return "redirect:/login/";

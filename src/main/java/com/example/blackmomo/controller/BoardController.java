@@ -488,28 +488,23 @@ public class BoardController {
      * @param session
      */
     @RequestMapping("/reply/insert") //세부적인 url pattern
-    public void insert( @ModelAttribute Reply dto, HttpSession session, ModelAndView mav) {
+    public String insert( @ModelAttribute Reply dto, HttpSession session, ModelAndView mav) {
 
-        /*String userId = (String) session.getAttribute("userId");
-        dto.setReplyer(userId);*/
 
-        String userId = "userId";
+        String userId = (String) session.getAttribute("nickname");
+        System.out.println("userId 확인 ::: " + userId );
         dto.setReplyer(userId);
-
-        System.out.println("등록 도착 ::: " + dto);
-
+        System.out.println("아이디 확인 :::" + dto.getReplyer());
         //댓글 작성자 아이디
         //현재 접속중인 사용자 아이디
        /* String userid=(String)session.getAttribute("userid");*/
-        String name = "작성자 빡";
-        dto.setName(name);
-
-        System.out.println("작성자 ::: " + dto.getReplyer());
+        /*String name = "작성자 빡";
+        dto.setName(name);*/
 
         //댓글이 테이블에 저장됨
         boardService.create(dto);
-        System.out.println("확인" + dto);
         //jsp 페이지로 가거나 데이터를 리턴하지 않음
+        return "success";
     }
 
    /* @GetMapping("/reply/delReply/{rno}")
@@ -522,26 +517,24 @@ public class BoardController {
     }*/
 
     @PostMapping("/reply/update")
-    public void replyModify(@ModelAttribute Reply dto, HttpSession session){
-        String userId = "userId";
-        dto.setReplyer(userId);
+    public String replyModify(@ModelAttribute Reply dto, HttpSession session){
 
+
+        System.out.println("비밀글 체크 :::" + dto.getSecretReply());
         //댓글 작성자 아이디
         //현재 접속중인 사용자 아이디
         /* String userid=(String)session.getAttribute("userid");*/
-        String name = "작성자 빡";
-        dto.setName(name);
-
         //댓글이 테이블에 저장됨
         boardService.modify(dto);
+        return "success";
     }
 
     @PostMapping("/reply/replyDelete")
-    public void replyDelete(@ModelAttribute Reply dto, HttpSession session){
-        String userId = "userId";
-        dto.setReplyer(userId);
+    public String replyDelete(@ModelAttribute Reply dto, HttpSession session){
         System.out.println("삭제 도착 ::: " + dto);
 
         boardService.replyDelete(dto);
+
+        return "success";
     }
 }

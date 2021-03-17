@@ -10,7 +10,9 @@
 <header th:replace="layout/header :: header"></header>
 
 <!-- 아래 div가 컨트롤러에 의해 교체되는 content 영역이다. -->
-<div layout:fragment="content"></div>
+<div layout:fragment="content1" style="float: left; width: 10%; min-height: 500px;">1</div>
+<div layout:fragment="content2" style="float: left; width: 80%; min-height: 500px;">2</div>
+<div layout:fragment="content3" style="float: left; width: 10%; min-height: 500px;">3</div>
 
 <!-- body 태그 내부의 footer를 담당하는 부분이다. -->
 <footer th:replace="layout/footer :: footer"></footer>

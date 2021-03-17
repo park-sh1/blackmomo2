@@ -16,7 +16,7 @@
             <label for="title" class="col-sm-2 col-form-label"><strong>제목</strong></label>
             <input type="text" id="title" name="title" class="form-control mb-2" placeholder="제목을 입력해주세요." required>
             <label for="title" class="col-sm-2 col-form-label"><strong>작성자</strong></label>
-            <input type="text" id="registerer" name="registerer" class="form-control mb-2" placeholder="작성자 이름을 입력해주세요." required>
+            <input type="text" id="registerer" name="registerer" class="form-control mb-2" th:value="${session.member?.nickname}" readonly>
             <div class="form-group">
                 <textarea class="form-control" rows="10" id="content" name="content" placeholder="내용을 입력해주세요" required ></textarea>
             </div>
@@ -56,6 +56,15 @@
 </div>
 <fooler th:insert="layout/fooler.html"></fooler>
 <script type="text/javascript">
+    /*$(document).ready(function() {
+        alert("TEST");
+        var session = [[${session.member}]];
+        if (session == null){
+            alert("로그인이 필요합니다.")
+            location.replace('/login/login');
+        }
+    });*/
+
     function add(){
         var form = document.boardForm;
 

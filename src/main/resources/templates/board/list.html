@@ -209,7 +209,7 @@
                 </th:block>
             </div>
         </th:block>
-        <div class="row">
+        <div class="row" th:if="${session?.member != null}">
             <div class="col-auto mr-auto"></div>
             <div class="col-auto">
                 <a class="btn btn-primary" th:href="@{/board/post}" role="button">게시글작성</a>

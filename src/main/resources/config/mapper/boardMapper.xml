@@ -263,6 +263,7 @@
         update reply
         set reply_text = #{replyText}
           , modi_dt = sysdate()
+          , secret_reply = #{secretReply}
         where rno = #{rno} and bno = #{bno}
     </update>
 
