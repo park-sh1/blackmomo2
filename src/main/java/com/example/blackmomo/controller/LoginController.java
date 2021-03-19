@@ -79,7 +79,6 @@ public class LoginController {
             rttr.addFlashAttribute("msg", false);
             re = "redirect:/login/";
         } else if (login != null){
-            System.out.println("정보 확인 ::: " + member.getUserId());
             session.setAttribute("member", login);
             session.setAttribute("userId", login.getUserId());
             session.setAttribute("nickname", login.getNickname());
@@ -95,25 +94,36 @@ public class LoginController {
 
         // 세션의 속성을 삭제하려면 session 객체의 removeAttribute() 메소드를 사용
         // 세션의 모든 속성을 삭제할 때는 session 객체의 invalidate() 메소드를 사용
-
         session.invalidate();
         return "redirect:/login/";
     }
-
-
-    @PostMapping("/doubleCheck")
-    public String doubleCheck(){
-        return null;
-    }
-
 
     /**
      * <p>id찾기 화면으로</p>
      * @return
      */
     @GetMapping("/idFind")
-    public String idFind() {
-        return "/login/idFind.html";
+    public String idFind() { return "/login/idFind.html"; }
+
+    @RequestMapping(value="/idFind", method = RequestMethod.POST)
+    public String idFindForm(Member member, RedirectAttributes rttr, Model model) {
+
+        System.out.println("name ::: " + member.getName() + "email ::: " + member.getEmail());
+
+        Member userId = loginService.idFind(member);
+
+        String re = null;
+
+        if(userId == null){
+            rttr.addFlashAttribute("msg", false);
+            re = "redirect:/login/idFind";
+        } else if ( userId != null){
+            rttr.addFlashAttribute("msg", true);
+            model.addAttribute("member", userId);
+            re = "/login/idFind2.html";
+        }
+
+        return re;
     }
 
     /**
@@ -122,19 +132,56 @@ public class LoginController {
      */
     @GetMapping("/pwFind")
     public String pwFind() {
-        return "/login/idFind.html";
+        return "/login/pwFind.html";
     }
 
     /**
-     * <p>pw찾기 화면으로</p>
-     * <p>id 찾기에서 바로 pw찾기로 넘어가는 경우</p>
+     * <p>비밀번호 찾기 처리</p>
+     * @param member
+     * @param rttr
+     * @param model
      * @return
      */
-    @GetMapping("/login/idFind")
-    public String pwFind2() {
-        return "/login/idFind.html";
+    @RequestMapping(value = "/pwFind", method = RequestMethod.POST)
+    public String pwFindForm(Member member, RedirectAttributes rttr, Model model) {
+
+        System.out.println("id ::: " + member.getUserId() + ", name ::: " + member.getName() + ", email ::: " + member.getEmail());
+
+        Member pass = loginService.pwFindForm(member);
+
+        System.out.println("비번확인 ::: " + pass.getPass());
+
+        String re = null;
+
+        if(pass == null){
+            rttr.addFlashAttribute("msg", false);
+            re = "redirect:/login/pwFind";
+        } else if (pass != null) {
+            rttr.addFlashAttribute("msg", true);
+            model.addAttribute("member",  pass);
+            re = "/login/pwFind2.html";
+        }
+
+        return re;
     }
 
+    // 비밀번호 변경
+    @RequestMapping(value="/pwCheck", method = RequestMethod.POST)
+    public String pwCheck(Member member) {
+
+        System.out.println("비밀번호 변경");
+
+        loginService.pwChange(member);
+
+        return "redirect:/login/";
+    }
+
+
+
+    /**
+     * <p>아이디 중복체크 팝업창으로 이동</p>
+     * @return
+     */
     @GetMapping("/idCheckForm")
     public String idCheckForm(){ return "/login/idCheckForm.html"; }
 

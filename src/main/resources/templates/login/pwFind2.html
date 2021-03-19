@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<header th:insert="layout/header.html"></header>
+<div>
+    <div style="width:80%; margin: 10px  auto;">
+        <div>
+            <div>
+                <form name="pwCheck" method="post" action="/login/pwCheck">
+                    <div>
+                        <input type="hidden" id="userNo" name="userNo" th:value="${member.userNo}">
+                    </div>
+                    <div>
+                        <input type="password" id="exPass" name="exPass" placeholder="기존 비밀번호를 입력하세요">
+                    </div>
+                    <div>
+                        <input type="password" id="pass" name="pass" placeholder="변경할 비밀번호를 입력하세요">
+                    </div>
+                    <div>
+                        <input type="password" id="passCheck" name="passCheck" placeholder="다시 변경할 비밀번호를 입력하세요" >
+                    </div>
+                    <div>
+                        <input type="button" onclick="pwCheck()" value="비밀번호 변경">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<fooler th:insert="layout/fooler.html"></fooler>
+<script type="text/javascript">
+    function pwCheck(){
+        var form = document.pwCheck;
+        var pass = [[${member.pass}]];
+        alert("기존 비밀번호 확인1 ::: " + pass);
+        alert("기존 비밀번호 확인2 ::: " + form.exPass.value);
+        alert("변경 비밀번호 확인1 ::: " + form.pass.value);
+        alert("변경 비밀번호 확인2 ::: " + form.passCheck.value);
+        /*var form = document.pwCheck;
+        action="/login/pwCheck"
+        var pass = [[${member.pass}]];
+        alert("기존 비밀번호 확인1 ::: " + pass);
+        alert("기존 비밀번호 확인2 ::: " + form.exPass.value);
+        alert("변경 비밀번호 확인1 ::: " + form.pass.value);
+        alert("변경 비밀번호 확인2 ::: " + form.passCheck.value);
+
+        var regex = /^.*(?=^.{8,15}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&+=]).*$/;
+
+        if(form.exPass.value == pass){
+            alert("기존 비밀번호가 다릅니다.")
+            form.exPass.focus();
+            return false;
+        }
+        if(form.exPass.value == form.pass.value){
+            alert("기존 비밀번호와 변경 비밀번호가 같을수 없습니다.")
+            form.pass.focus();
+            return false;
+        }
+        if(!regex.test($("input[id='pass']").val())){
+
+            alert("변경할 비밀번호형식에 문제가 있습니다. 확인 부탁드립니다.")
+            return false;
+        }
+        if(form.pass.value != form.passCheck.value){
+            alert("비밀번호를 동일하게 입력해주세요.");
+            return false;
+        }
+
+        alert("비밀번호 변경")*/
+        return false;
+    }
+</script>
+</body>
+</html>

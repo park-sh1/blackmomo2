@@ -18,12 +18,12 @@
         <div>
             <!--<p class="card-text"><small class="text-muted" th:text="@{' 작성자 : ' +${view.author} + ' / ' + '작성일자 : ' +  ${#temporals.format(view.createdDate, 'yyyy-MM-dd HH:mm')}}"></small></p>-->
             <th:block th:if="${view.registerDate == view.modifiedDate}">
-                <p class="card-text" th:text="@{' 최종작성자 : ' +${view.registerer}}" style="matgin-bottom:0;"></p>
+                <p class="card-text" th:text="@{'최종작성자 : ' +${view.registerer}}" style="matgin-bottom:0;"></p>
                 <p class="card-text" th:text="@{'작성일자 : ' +  ${#temporals.format(view.registerDate, 'yyyy-MM-dd HH:mm:ss')}}"></p>
                 <!--<p class="card-text" th:text="@{' 최종작성자 : ' +${view.registerer} + ' / ' + '작성일자 : ' +  ${view.registerDate}}"><small class="text-muted"></small></p>-->
             </th:block>
             <th:block th:if="${view.registerDate != view.modifiedDate}">
-                <p class="card-text" th:text="@{' 최종작성자 : ' +${view.modifier}}" style="matgin-bottom:0;"></p>
+                <p class="card-text" th:text="@{'최종작성자 : ' +${view.modifier}}" style="matgin-bottom:0;"></p>
                 <p class="card-text" th:text="@{'작성일자 : ' +  ${#temporals.format(view.modifiedDate, 'yyyy-MM-dd HH:mm:ss')}}"></p>
             </th:block>
         </div>
@@ -159,8 +159,8 @@
             , success:function(data){
                 alert("댓글이 등록되었습니다.");
                 if (data == 'success'){
-                    $("#replyText").val(data);
-                    window.location.href = data.redirect;
+                    $("#replyText").val(replyText);
+                    location.reload();
                 }
             }
             , error:function () {

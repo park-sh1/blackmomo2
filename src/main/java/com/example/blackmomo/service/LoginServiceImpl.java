@@ -37,4 +37,19 @@ public class LoginServiceImpl implements LoginService {
     public Member login(Member member) throws Exception{
         return loginMapper.login(member);
     }
+
+    @Override
+    public Member idFind(Member member) {
+        return loginMapper.idFind(member);
+    }
+
+    @Override
+    public Member pwFindForm(Member member) {
+        return loginMapper.pwFindForm(member);
+    }
+
+    @Override
+    public void pwChange(Member member) {
+        loginMapper.pwChange(member);
+    }
 }

@@ -136,8 +136,26 @@
 
     <!-- 로그인 처리 -->
     <select id="login" resultMap="memberResultMap">
-        select user_id, pass, nickname
+        select user_id, pass, nickname, manager_yn
         from member
         where user_id = #{userId} and pass = #{pass}
     </select>
+
+    <select id="idFind" resultMap="memberResultMap">
+        select user_id
+        from member
+        where name = #{name} and email = #{email}
+    </select>
+    <select id="pwFindForm" resultMap="memberResultMap">
+        select user_no, pass
+        from member
+        where user_id = #{userId} and name = #{name} and email = #{email}
+    </select>
+
+    <update id="pwChange">
+        update member
+        set pass = #{pass}, pass_check = #{passCheck}
+        where user_no = #{userNo}
+    </update>
+
 </mapper>

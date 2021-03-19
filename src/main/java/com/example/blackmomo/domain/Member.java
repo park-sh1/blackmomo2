@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 public class Member {
 
-    private int    userNO;          // 회원번호
+    private int    userNo;          // 회원번호
     private String userId;          // 회원id
     private String pass;            // 패스워드(비밀번호)
     private String passCheck;       // 패스워드2(비밀번호확인)

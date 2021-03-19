@@ -5,6 +5,51 @@
     <title>Title</title>
 </head>
 <body>
+<header th:insert="layout/header.html"></header>
+<div>
+    <div style="width:80%; margin: 10px  auto;">
+        <div>
+            <div>
+                <form name="idFindForm" method="post" action="/login/idFind" onsubmit="return idFindCheck()" >
+                    <div>
+                        <input type="text" id="name" name="name" placeholder="이름을 입력해 주세요">
+                    </div>
+                    <div>
+                        <input type="email" id="email" name="email" placeholder="등록된 이메일을 입력해 주세요" >
+                    </div>
+                    <!--<div>
+                        <input type="email" id="email" name="email" placeholder="등록된 이메일을 입력해 주세요" > <span>인증번호 요청</span>
+                    </div>
+                    <div>
+                        <input type="text" placeholder="인증번호 (6자리)">
+                    </div>-->
+                    <th:block th:if="${msg == false}">
+                        <p style="color: #ff0000;">회원정보와 불일치합니다. 다시 한번 확인해 주세요.</p>
+                    </th:block>
+                    <button type="submit">아이디찾기</button>
+                </form>
+                <div><span><a href="/login/signUp">회원가입</a></span> | <span><a href="/login/pwFind">비밀번호찾기</a></span></div>
+            </div>
+        </div>
+    </div>
+</div>
+<fooler th:insert="layout/fooler.html"></fooler>
+<script type="text/javascript">
+    function idFindCheck(){
+        var form = document.idFindForm;
 
+        if(!form.name.value){
+            alert("이름을 입력해주세요.")
+            form.name.focus();
+            return false;
+        }
+        if(!form.email.value){
+            alert("이메일을 입력해주세요.")
+            form.email.focus();
+            return false;
+        }
+        return true;
+    }
+</script>
 </body>
 </html>

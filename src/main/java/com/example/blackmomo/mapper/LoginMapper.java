@@ -17,4 +17,10 @@ public interface LoginMapper {
 
     // 로그인처리
     Member login(Member member) throws Exception;
+
+    Member idFind(Member member);
+
+    Member pwFindForm(Member member);
+
+    void pwChange(Member member);
 }

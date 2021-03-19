@@ -488,6 +488,7 @@ public class BoardController {
      * @param session
      */
     @RequestMapping("/reply/insert") //세부적인 url pattern
+    @ResponseBody
     public String insert( @ModelAttribute Reply dto, HttpSession session, ModelAndView mav) {
 
 
@@ -516,7 +517,14 @@ public class BoardController {
         return ;
     }*/
 
+    /**
+     * <p>댓글 수정</p>
+     * @param dto
+     * @param session
+     * @return
+     */
     @PostMapping("/reply/update")
+    @ResponseBody
     public String replyModify(@ModelAttribute Reply dto, HttpSession session){
 
 
@@ -530,6 +538,7 @@ public class BoardController {
     }
 
     @PostMapping("/reply/replyDelete")
+    @ResponseBody
     public String replyDelete(@ModelAttribute Reply dto, HttpSession session){
         System.out.println("삭제 도착 ::: " + dto);
 

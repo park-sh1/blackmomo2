@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<header th:insert="layout/header.html"></header>
+<div>
+    <div style="width:80%; margin: 10px  auto;">
+        <div>
+            <div>
+                <p th:text="@{'ID : (' + ${member.userId} + ') 입니다.'}"></p>
+                <!--
+                <th:block th:if="${msg == true}">
+                    <p style="color: #ff0000;" th:text="@{'ID : ' + ${member.name} + ' 입니다.'}"></p>
+                </th:block>
+                -->
+                <div><span><a href="/login/signUp">회원가입</a></span> | <span><a href="/login/pwFind">비밀번호찾기</a></span></div>
+            </div>
+        </div>
+    </div>
+</div>
+<fooler th:insert="layout/fooler.html"></fooler>
+<script type="text/javascript">
+    /*function idFindCheck(){
+        var form = document.idFindForm;
+
+        if(!form.name.value){
+            alert("이름을 입력해주세요.")
+            form.name.focus();
+            return false;
+        }
+        if(!form.email.value){
+            alert("이메일을 입력해주세요.")
+            form.email.focus();
+            return false;
+        }
+        return true;
+    }*/
+</script>
+</body>
+</html>

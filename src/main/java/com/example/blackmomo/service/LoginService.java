@@ -19,6 +19,12 @@ public interface LoginService {
 
     Member login(Member member) throws Exception;
 
+    Member idFind(Member member);
+
+    Member pwFindForm(Member member);
+
+    void pwChange(Member member);
+
     // 회원 정보 수정
 
     // 회원 탈퇴
