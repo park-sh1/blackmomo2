@@ -160,10 +160,18 @@ public class LoginController {
             rttr.addFlashAttribute("msg", true);
             model.addAttribute("member",  pass);
             re = "/login/pwFind2.html";
+            /*re = "redirect:/login/pwFind2";*/
         }
 
         return re;
     }
+/*    @RequestMapping(value = "/pwFind2", method = RequestMethod.POST)
+    public String pwFind2(Member member, Model model) {
+
+        return null;
+    }*/
+
+
 
     // 비밀번호 변경
     @RequestMapping(value="/pwCheck", method = RequestMethod.POST)

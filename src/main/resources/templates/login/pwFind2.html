@@ -13,6 +13,7 @@
                 <form name="pwCheck" method="post" action="/login/pwCheck">
                     <div>
                         <input type="hidden" id="userNo" name="userNo" th:value="${member.userNo}">
+                        <input type="hidden" id="pass2" th:value="${member.pass}">
                     </div>
                     <div>
                         <input type="password" id="exPass" name="exPass" placeholder="기존 비밀번호를 입력하세요">
@@ -24,7 +25,8 @@
                         <input type="password" id="passCheck" name="passCheck" placeholder="다시 변경할 비밀번호를 입력하세요" >
                     </div>
                     <div>
-                        <input type="button" onclick="pwCheck()" value="비밀번호 변경">
+                        <input type="button" onclick="pwChange();" value="비밀번호 변경">
+                        <!--<a href="#" onclick="pwCheck();">비밀번호 변경</a>-->
                     </div>
                 </form>
             </div>
@@ -33,16 +35,10 @@
 </div>
 <fooler th:insert="layout/fooler.html"></fooler>
 <script type="text/javascript">
-    function pwCheck(){
+    function pwChange(){
+
         var form = document.pwCheck;
-        var pass = [[${member.pass}]];
-        alert("기존 비밀번호 확인1 ::: " + pass);
-        alert("기존 비밀번호 확인2 ::: " + form.exPass.value);
-        alert("변경 비밀번호 확인1 ::: " + form.pass.value);
-        alert("변경 비밀번호 확인2 ::: " + form.passCheck.value);
-        /*var form = document.pwCheck;
-        action="/login/pwCheck"
-        var pass = [[${member.pass}]];
+        var pass = $("#pass2").val();
         alert("기존 비밀번호 확인1 ::: " + pass);
         alert("기존 비밀번호 확인2 ::: " + form.exPass.value);
         alert("변경 비밀번호 확인1 ::: " + form.pass.value);
@@ -50,7 +46,7 @@
 
         var regex = /^.*(?=^.{8,15}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&+=]).*$/;
 
-        if(form.exPass.value == pass){
+        if(form.exPass.value != pass){
             alert("기존 비밀번호가 다릅니다.")
             form.exPass.focus();
             return false;
@@ -70,8 +66,10 @@
             return false;
         }
 
-        alert("비밀번호 변경")*/
-        return false;
+        alert("비밀번호 변경")
+        if (confirm("비밀번호 변경하시겠습니까?")){
+            form.submit();
+        }
     }
 </script>
 </body>

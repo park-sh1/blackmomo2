@@ -16,7 +16,7 @@
     <div style="width:80%; margin: 10px  auto;">
         <div>
             <div>
-                <form name="loginform" method="post" action="/login/loginForm">
+                <form name="loginform" method="post" action="/login/loginForm" onsubmit="return loginCheck()">
                     <div>
                         <input type="text" id="userId" name="userId" placeholder="id를 입력해 주세요">
                     </div>
@@ -48,12 +48,21 @@
 </div>
 <fooler th:insert="layout/fooler.html"></fooler>
 <script type="text/javascript">
-    /*function loginBtn(){
-        var id = document.getElementById("userId").value;
-        var pw = document.getElementById("password").value;
+    function loginCheck(){
+        var form = form.loginform;
 
-        if (confirm("")){}
-    }*/
+        if(form.userId.value){
+            alert("아이디를 입력해주세요.");
+            form.userId.focus();
+            return false;
+        }
+        if(form.pass.value){
+            alert("비밀번호를 입력해주세요.");
+            form.pass.focus();
+            return false;
+        }
+        return true;
+    }
 </script>
 </body>
 </html>
