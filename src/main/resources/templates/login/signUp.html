@@ -79,9 +79,9 @@
     </script>
 </head>
 <body>
-<header th:insert="layout/header.html"></header>
-<div>
-    <div style="width:80%; margin: 10px  auto;">
+<div layout:fragment="content2">
+    <div style="float: left; width: 80%; min-height: 500px;">
+    <!--<div style="width:80%; margin: 10px  auto;">-->
         <div style="width:800px;">
             <form action="/login/signUp" method="post" name="userInfo">
                 <h1>필수 정보</h1>
@@ -168,28 +168,6 @@
                                 <input type="text" name="address3" id="extraAddress" placeholder="참고항목">
                             </td>
                         </tr>
-                        <!-- 우편번호 -->
-                        <!--<tr>
-                            <th>*우편번호</th>
-                            <td>
-                                <input type="text" id="zipCode" maxlength="5">
-                            </td>
-                        </tr>
-                        &lt;!&ndash; 기본 주소 &ndash;&gt;
-                        <tr>
-                            <th>*기본 주소</th>
-                            <td>
-                                <input type="text" id="baseAddress" name="baseAddress">
-                                <input type="button" onclick="zipCheck()" value="주소검색">
-                            </td>
-                        </tr>
-                        &lt;!&ndash; 상세 주소 &ndash;&gt;
-                        <tr>
-                            <th>*상세 주소</th>
-                            <td>
-                                <input type="text" id="DetailedAddress" name="DetailedAddress">
-                            </td>
-                        </tr>-->
                         <!-- 휴대폰번호 -->
                         <tr>
                             <th>*휴대폰번호</th>
@@ -353,27 +331,9 @@
             </form>
         </div>
     </div>
+    <div style="float: left; width: 10%; min-height: 500px;" th:insert="layout/"></div>
 </div>
-    <!--
-    private int id; // 회원id
-    private String pass;// 패스워드(비밀번호)
-    private String pass2;// 패스워드2(비밀번호확인)
-    private String name;// 이름
-    private String nickname;// 닉네임(별명)
-    private String zipCode;// 우편번호
-    private String baseAddress;// 주소
-    private String DetailedAddress;// 상세주소
-    private String phoneNumber;// 휴대폰번호
-    private String gender;// 성별
-    private String dateOfBirth;// 생년월일
-    private String interest1;// 관심분야1
-    private String interest2;// 관심분야2
-    private String interest3;// 관심분야3
-    private String managerYn;// 관리자여부
-    private String certificationYn;// 인증여부
-    -->
 <!--<footer th:insert="layout/footer.html"></footer>-->
-<fooler th:insert="layout/fooler.html"></fooler>
 <script type="text/javascript">
     /* 아이디 중복체크 */
     /*$("#doubleCheck").click(function (){
@@ -403,7 +363,6 @@
     3. 연속되는 숫자 또는 문자, 영문은 3자리 이상 사용 할 수 없다.
     4. 아이디와 동일하거나 3자리 이상 일치하는 비밀번호는 사용 할 수 없다.
     */
-
 
     /* 비밀번호 체크 */
     $("#pass").keyup(function(){
@@ -454,7 +413,6 @@
         });
     });
 
-
     /* 비밀번호 확인 체크 */
     $("#passCheck").keyup(function(){
         var form = document.userInfo;
@@ -476,9 +434,6 @@
         // 우편번호 검색창 띄우기
         window.open("/login/zipCheck", "zipchkForm", "width=500, height=300, resizable = no, scrolbars = no");
     }
-
-
-
 
     // 회원가입 화면의 입력값들을 검사(id,pw, pw 일치여부, 이름 )
     function checkValue(){
@@ -565,8 +520,6 @@
 
     // 아이디 중복체크 화면 open
     function openIdChk(){
-        /*var id = document.getElementById("id").value;
-        alert("확인 :::" + id);*/
         window.name = "parentForm";
         /*window.open("/login/idCheckForm", form.id.value, "width=500, height=300, resizable = no, scrolbars = no");*/
         /*window.open("/login/idCheckForm/" + id, "chkForm", "width=500, height=300, resizable = no, scrolbars = no");*/

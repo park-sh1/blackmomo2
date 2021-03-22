@@ -3,6 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <style>
+        #pwCheck > div > input{
+            width : 300px;
+        }
+        #showPass{
+            width : auto;
+        }
+    </style>
 </head>
 <body>
 <header th:insert="layout/header.html"></header>
@@ -10,23 +18,26 @@
     <div style="width:80%; margin: 10px  auto;">
         <div>
             <div>
-                <form name="pwCheck" method="post" action="/login/pwCheck">
+                <form id="pwCheck" name="pwCheck" method="post" action="/login/pwCheck">
                     <div>
                         <input type="hidden" id="userNo" name="userNo" th:value="${member.userNo}">
                         <input type="hidden" id="pass2" th:value="${member.pass}">
                     </div>
                     <div>
+                        <label for="exPass">기존 비밀번호 입력</label>
                         <input type="password" id="exPass" name="exPass" placeholder="기존 비밀번호를 입력하세요">
                     </div>
                     <div>
+                        <label for="pass">변경 비밀번호 입력</label>
                         <input type="password" id="pass" name="pass" placeholder="변경할 비밀번호를 입력하세요">
+                        <input type="button" id="showPass" value="비밀번호 표시">
                     </div>
                     <div>
+                        <label for="passCheck">변경 비밀번호 확인</label>
                         <input type="password" id="passCheck" name="passCheck" placeholder="다시 변경할 비밀번호를 입력하세요" >
                     </div>
                     <div>
-                        <input type="button" onclick="pwChange();" value="비밀번호 변경">
-                        <!--<a href="#" onclick="pwCheck();">비밀번호 변경</a>-->
+                        <input type="button" onclick="pwChange();" style="width:auto;" value="비밀번호 변경">
                     </div>
                 </form>
             </div>
@@ -71,6 +82,22 @@
             form.submit();
         }
     }
+    $(document).ready(function(){
+        $('#showPass').on('click', function(){
+            var passField = $('#pass');
+            var passFidedType = passField.attr('type');
+
+            if(passFidedType == 'password'){
+                passField.attr('type', 'text');
+                $(this).val('비밀번호 숨김')
+            }
+
+            else if(passFidedType == 'text'){
+                passField.attr('type', 'password');
+                $(this).val('비밀번호 표시');
+            }
+        })
+    });
 </script>
 </body>
 </html>

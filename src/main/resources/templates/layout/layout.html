@@ -1,16 +1,26 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.nert.nz/thymeleaf/layout">
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.nert.nz/thymeleaf/layout">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Title</title>
+
+    <!-- 공통으로 쓰이는 css파일을넣는다.-->
+        <!-- Bootstrap core CSS -->
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Custom styles for this template -->
+    <link href="/css/heroic-features.css" rel="stylesheet">
+
+    <script src="/vendor/jquery/jquery.min.js"></script>
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
 <!-- body 태그 내부의 header를 담당하는 부분이다. -->
 <header th:replace="layout/header :: header"></header>
 
 <!-- 아래 div가 컨트롤러에 의해 교체되는 content 영역이다. -->
-<div layout:fragment="content1" style="float: left; width: 10%; min-height: 500px;">1</div>
+<div th:replace="layout/subNav :: subNav" style="float: left; width: 10%; min-height: 500px;">서브메뉴</div>
 <div layout:fragment="content2" style="float: left; width: 80%; min-height: 500px;">2</div>
 <div layout:fragment="content3" style="float: left; width: 10%; min-height: 500px;">3</div>
 

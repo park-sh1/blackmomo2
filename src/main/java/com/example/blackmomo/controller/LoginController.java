@@ -149,8 +149,6 @@ public class LoginController {
 
         Member pass = loginService.pwFindForm(member);
 
-        System.out.println("비번확인 ::: " + pass.getPass());
-
         String re = null;
 
         if(pass == null){
