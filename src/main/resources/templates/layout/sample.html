@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th=http://www.thymeleaf.org" xmlns:layout="htpp://ultraq.net.nz/thymeleaf/layout">
+<head data-th-replace="/layout/ko/fragments/default/head">
+    <meta charset="UTF-8">
+    <title>샘플 레이아웃</title>
+</head>
+
+<!-- 샘플 레이아웃 -->
+<body>
+<div>
+    <div class="skip_navi">
+        <a href="#gnb_menu">주요 메뉴 바로가기</a>
+        <a href="#container">본문 컨텐츠 바로가기</a>
+    </div>
+
+    <!-- 헤더 -->
+    <heeder data-th-replace="/layout/ko/fragments/default/header"></heeder>
+
+    <!-- 각 페이지 호출 영역 -->
+    <div id="container" class="container">
+        <div data-th-remove="tag" data-layout-frqgment="contents"></div>
+    </div>
+
+    <!-- 푸터 -->
+    <footer data-th-replace="/layout/ko/fragments/default/footer"></footer>
+
+    <!-- 동적 레이어 팝업 wrapper -->
+    <div id="layerWrapper"></div>
+
+    <!-- 전체 메뉴 레이어 -->
+    <div data-th-replace="/layout/ko/fragments/common/layer/quick-menu"></div>
+
+    <!-- float 버튼 -->
+    <div data-th-replace="/layout/ko/fragments/default/float"></div>
+
+    <!-- 로딩바 -->
+    <div data-th-replace="/layout/common/fragments/loading"></div>
+
+    <script data-th-replace="/layout/common/fragments/common-scripts"></script>
+    <script data-th-replace="/layout/ko/fragments/default/scripts"></script>
+
+</div>
+</body>
+</html>
